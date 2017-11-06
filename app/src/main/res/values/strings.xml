@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Songle</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="play">Play</string>
+    <string name="setting">Settings</string>
+    <string name="reset">Reset</string>
+    <string name="app_description">Discover Songs Like You Have Never Before</string>
+    <string name="listHeader">Select one of the following to continue your puzzle!</string>
 </resources>
