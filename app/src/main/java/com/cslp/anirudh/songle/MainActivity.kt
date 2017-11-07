@@ -11,9 +11,16 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import android.R.attr.name
+import android.content.Context
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import android.net.NetworkInfo
+import android.content.Context.CONNECTIVITY_SERVICE
+import android.net.ConnectivityManager
+import android.support.v4.content.ContextCompat
+import android.support.design.widget.Snackbar
+import android.widget.Toast
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,98 +38,65 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         // download song list
-        val listener = SongDownloadListener()
-        val downloader = DownloadXmlTask(listener)
-        downloader.execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+
+        if (downloadSongList()){
+            // do nothing
+        } else {
+            Log.d(tag,"Network Unavailable")
+            // See if a previous copy of songs is available and use that
+            // For now, a snack bar --
+            //create a snackbar telling the user there is no internet connection and issuing a chance to reconnect
+            val snackbar = Snackbar.make(findViewById(android.R.id.content),
+                    "No internet connection.",
+                    Snackbar.LENGTH_INDEFINITE)
+            snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
+                    R.color.colorAccent))
+            snackbar.setAction(R.string.try_again, View.OnClickListener {
+                //recheck internet connection and call DownloadJson if there is internet
+            }).show()
+        }
+
+
     }
 
-    fun showListOfSongs(view: View):Unit {
-        val intent = Intent(this,ListOfSongs::class.java)
-        startActivity(intent)
+    fun showListOfSongs(view: View) {
+        if (!songList.isEmpty()){
+            val intent = Intent(this,ListOfSongs::class.java)
+            startActivity(intent)
+        }
+        else {
+            Toast.makeText(this, "Failed to download latest songs", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ensure active internet connection", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
+    private fun downloadSongList() : Boolean{
+        if (isNetworkAvailable()){
+            Log.d(tag,"Network available")
+            val listener = SongDownloadListener(this)
+            val downloader = DownloadXmlTask(listener)
+            downloader.execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+            return true
+        }
+        else {
+            return false
+        }
+
     }
 
 
 }
 
 
-class SongDownloadListener : DownloadCompleteListener{
-    override fun downloadComplete(result: String) {
-        Log.i("SongDownloadListener",result)
-        assert(result!=null)
-        MainActivity.songList =  parseXml(result)
-    }
-
-    fun parseXml(s: String):ArrayList<Song> {
-        var songs = ArrayList<Song>()
-        songs = parse(s)
-
-        return songs
-    }
-
-    // We don’t use namespaces
-    private val ns: String? = null
-
-    @Throws(XmlPullParserException::class, IOException::class)
-    fun parse(input : String): ArrayList<Song> {
-        var songs = ArrayList<Song>()
-        val stream:InputStream = ByteArrayInputStream(input.toByteArray(StandardCharsets.UTF_8))
-
-        val parser = Xml.newPullParser()
-        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,
-                false)
-        parser.setInput(stream,null)
-        parser.nextTag()
-        return readFeed(parser)
-    }
-
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun readFeed(parser: XmlPullParser): ArrayList<Song> {
-        val songs = ArrayList<Song>()
-        parser.require(XmlPullParser.START_TAG, ns, "Songs")
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.eventType != XmlPullParser.START_TAG) {
-                continue
-            }
-            // Starts by looking for the entry tag
-            if (parser.name == "Song") {
-                songs.add(readSong(parser))
-            }
-        }
-        return songs
-    }
-
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun readSong(parser: XmlPullParser): Song {
-        parser.require(XmlPullParser.START_TAG, ns, "Song")
-        var number = ""
-        var artist = ""
-        var title = ""
-        var link = ""
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.eventType != XmlPullParser.START_TAG)
-                continue
-            when(parser.name){
-                    "Number" -> number = readText(parser)
-                    "Artist" -> artist = readText(parser)
-                    "Title" -> title = readText(parser)
-                    "Link" -> link = readText(parser)
-            }
-        }
-        return Song(number, artist,title, link)
-    }
 
 
-    @Throws(IOException::class, XmlPullParserException::class)
-    private fun readText(parser: XmlPullParser): String {
-
-        var result = ""
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.text
-            parser.nextTag()
-        }
-        return result
-    }
-}
 
 
 

@@ -5,4 +5,33 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cslp.anirudh.songle.MapsActivity" />
+    tools:context="com.cslp.anirudh.songle.MapsActivity">
+
+    <Button
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="8dp"
+        android:layout_gravity="right|top"
+        android:text="@string/guess"
+        android:padding="10dp"
+        android:layout_marginTop="20dp"
+        android:paddingRight="10dp"
+        android:alpha="0.75"
+        />
+
+    <TextView
+        android:id="@+id/textViewProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="8dp"
+        android:layout_gravity="left|top"
+        android:text="@string/progress"
+        android:padding="10dp"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimary"
+        android:alpha="0.8"
+        />
+</fragment>

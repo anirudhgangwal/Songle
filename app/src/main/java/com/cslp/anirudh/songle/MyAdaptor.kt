@@ -1,13 +1,10 @@
 package com.cslp.anirudh.songle
 
 import android.content.Context
-import android.widget.TextView
 import android.widget.TwoLineListItem
-import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import java.nio.file.Files.size
 import android.widget.BaseAdapter
 
 
@@ -48,8 +45,23 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
         val text2 = twoLineListItem.text2
 
         text1.text = (songs[position].getNumberName())
-        text2.text = "0%" + " Complete" // Use a function to find % complete
+        text2.text = "${songs[position].percentageComplete}%" + " Complete" // Use a function to find % complete
+
+        if(isEnabled(position)) {
+            twoLineListItem.setBackgroundColor(parent.getResources().getColor(R.color.active_list_item));
+            //twoLineListItem.background = ColorfulListItemDrawable(R.color.abc_tint_spinner)
+        } else {
+            twoLineListItem.setBackgroundColor(parent.getResources().getColor(R.color.inactive_list_item));
+        }
 
         return twoLineListItem
+    }
+
+    override fun isEnabled(position: Int): Boolean {
+        return MainActivity.songList[position].unlocked
+    }
+
+    override fun areAllItemsEnabled(): Boolean {
+        return false
     }
 }
