@@ -20,52 +20,10 @@ class ListOfSongs : ListActivity() {
 
         var song: Song
 
-        var songs = ArrayList<Song>()
+        var songs = MainActivity.songList
 
         // Replace below code . Use XML to get this data
-        song = Song("1","Anirudh","My Song","https://www.google.com")
-        songs.add(song)
 
-        song = Song("2","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-
-        song = Song("3","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-
-        song = Song("4","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-
-        song = Song("5","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-
-        song = Song("6","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
-        song = Song("7","Akshay","His Song","https://www.google.com")
-        songs.add(song)
 
 
         listAdapter = MyAdapter(this, songs)

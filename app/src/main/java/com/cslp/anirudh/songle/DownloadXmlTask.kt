@@ -35,7 +35,7 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
         Log.d(tag,"load xml from network ...")
         val result = downloadUrl(urlString)
         // Do something with stream e.g. parse as XML, build result
-        
+
         Log.d(tag,"loadXmlFromNetwork returns "+ result)
         return result
     }
