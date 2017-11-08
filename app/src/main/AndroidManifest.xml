@@ -50,6 +50,7 @@
                 android:value="com.cslp.anirudh.songle.MainActivity" />
         </activity>
         <activity android:name=".ListOfSongs" />
+        <activity android:name=".StatsActivity"></activity>
     </application>
 
 </manifest>

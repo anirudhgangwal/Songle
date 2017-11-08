@@ -14,7 +14,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     var percentageComplete = "0"
     var unlocked = false
-    var map1: KmlLayer? = null
+    var guessed = false // Must implement details
 
     fun getNumberName(): String = "Song " + number
 
@@ -26,10 +26,9 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         val url:String = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
         // Send this url to download kml file
         if (isNetworkAvailable()) {
-            val caller = MapDownloadListener(number.toInt())
+            val caller = MapDownloadListener(number.toInt(),"map1")
             val kmlDownloader = DownloadXmlTask(caller)
             kmlDownloader.execute(url)
-
         }
 
     }
@@ -42,7 +41,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     fun setMap1(kmlString: String){
         val FILENAME = "song_"+number+"_map1"
-        Log.d(tag,"Writin file with name: $FILENAME")
+        Log.d(tag,"Writing file with name: $FILENAME")
         val string = kmlString
 
         val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
@@ -52,9 +51,10 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
 }
 
-class MapDownloadListener(val number: Int) : DownloadCompleteListener {
+class MapDownloadListener(val number: Int,val description:String) : DownloadCompleteListener {
     override fun downloadComplete(kmlString: String) {
+        if (description == "map1")
+            MainActivity.songList[number-1].setMap1(kmlString)
 
-        MainActivity.songList[number-1].setMap1(kmlString)
     }
 }
