@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:elevation="8dp">
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/holo_orange_dark"
         android:elevation="12dp"
         android:paddingBottom="5dp"
         android:paddingLeft="10dp"
@@ -17,6 +18,6 @@
         android:paddingTop="9dp"
         android:text="@string/listHeader"
         android:textAlignment="textStart"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textSize="14sp" />
 </LinearLayout>

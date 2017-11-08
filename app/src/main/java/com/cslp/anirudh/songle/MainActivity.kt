@@ -83,6 +83,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun showStats(view: View) {
+        val intent = Intent(this,StatsActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo

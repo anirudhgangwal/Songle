@@ -26,6 +26,7 @@ class ListOfSongs : ListActivity() {
         val lv = listView
         val inflater = layoutInflater
         val header = inflater.inflate(R.layout.listheader, lv, false)
+        header.elevation=8.0f
         lv.addHeaderView(header, null, false)
     }
 
