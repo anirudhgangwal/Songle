@@ -15,6 +15,7 @@
         android:layout_gravity="right|top"
         android:text="@string/guess"
         android:padding="10dp"
+        android:onClick="showGuessActivity"
         android:layout_marginTop="20dp"
         android:paddingRight="10dp"
         android:alpha="0.75"

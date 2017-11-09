@@ -101,6 +101,8 @@ class MainActivity : AppCompatActivity() {
         downloader.execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
     }
 
+
+
     override fun onStop() {
         super.onStop()
         /**try {

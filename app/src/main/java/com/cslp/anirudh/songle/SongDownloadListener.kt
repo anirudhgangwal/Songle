@@ -34,7 +34,7 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(input : String): ArrayList<Song> {
         var songs = ArrayList<Song>()
-        val stream: InputStream = ByteArrayInputStream(input.toByteArray(StandardCharsets.UTF_8))
+        val stream: InputStream = input.byteInputStream()   //ByteArrayInputStream(input.toByteArray(StandardCharsets.UTF_8))
 
         val parser = Xml.newPullParser()
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,

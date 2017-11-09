@@ -19,7 +19,6 @@ class ListOfSongs : ListActivity() {
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
 
-        var song: Song
         setStatus(MainActivity.songList)
         listAdapter = MyAdapter(this, MainActivity.songList)
 
