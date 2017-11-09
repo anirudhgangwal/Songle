@@ -19,4 +19,9 @@
     <string name="collected_words">Collected Words:</string>
     <string name="build_sentence">Try building a sentence... (click words): </string>
     <string name="reset_sentence">Reset Sentence</string>
+    <string name="congrats">Congratulations! You guessed correctly!</string>
+    <string name="song">Song:</string>
+    <string name="artist">Artist:</string>
+    <string name="distance_song">Distance covered for this song:</string>
+    <string name="video">Youtube Video</string>
 </resources>
