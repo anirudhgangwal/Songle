@@ -15,6 +15,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var percentageComplete = "0"
     var unlocked = false
     var guessed = false // Must implement details
+    var distance = 1.5
 
     fun getNumberName(): String = "Song " + number
 

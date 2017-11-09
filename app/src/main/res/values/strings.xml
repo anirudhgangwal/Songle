@@ -23,5 +23,6 @@
     <string name="song">Song:</string>
     <string name="artist">Artist:</string>
     <string name="distance_song">Distance covered for this song:</string>
-    <string name="video">Youtube Video</string>
+    <string name="video">Video</string>
+    <string name="home">Back to Song List</string>
 </resources>

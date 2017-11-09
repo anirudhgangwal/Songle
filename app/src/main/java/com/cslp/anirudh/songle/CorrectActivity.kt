@@ -9,6 +9,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
+import kotlinx.android.synthetic.main.activity_correct.*
 
 
 class CorrectActivity : AppCompatActivity() {
@@ -19,14 +20,22 @@ class CorrectActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_correct)
+
         song_number = intent.getIntExtra("songNumber",0)
-        videoId = getVideoId(MainActivity.songList[song_number!!-1].link)
+        val song = MainActivity.songList[song_number!!-1]
+
+        videoId = getVideoId(song.link)
+        textView11.text = song.title
+        textView12.text = "By ${song.artist}"
+        textView13.text = "Distance covered: ${song.distance} Miles"
     }
+
+
     fun showVideo(view: View){
         watchYoutubeVideo(this,videoId)
     }
 
-    fun watchYoutubeVideo(context: Context, id: String) {
+    private fun watchYoutubeVideo(context: Context, id: String) {
         val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id))
         val webIntent = Intent(Intent.ACTION_VIEW,
                 Uri.parse("http://www.youtube.com/watch?v=" + id))
@@ -46,5 +55,10 @@ class CorrectActivity : AppCompatActivity() {
         }
         Log.d(tag,"Anirudh returned id: $id original link: $link")
         return id
+    }
+
+    fun backToSongList(view: View){
+        val intent = Intent(this,ListOfSongs::class.java)
+        startActivity(intent)
     }
 }
