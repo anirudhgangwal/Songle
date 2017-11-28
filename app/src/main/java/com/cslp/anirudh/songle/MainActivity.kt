@@ -19,13 +19,22 @@ import android.support.v4.content.ContextCompat
 import android.support.design.widget.Snackbar
 import android.widget.Toast
 import java.io.*
+import java.sql.Timestamp
+import android.content.SharedPreferences
+import android.R.id.edit
+
+
+
+
 
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        var timestamp: Timestamp? = null
         var songList = ArrayList<Song>()
     }
+
     val tag = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,39 +45,22 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        // Work on this. First check if timestamp changed.
-        try {
-            //Log.d(tag,"Trying to open songList")
-            //val fis = openFileInput("songList")
-            //val ins = ObjectInputStream(fis)
-            //MainActivity.songList = ins.readObject() as ArrayList<Song>
-            //ins.close()
-            //fis.close()
-            //Log.d(tag,"songList file found")
-        } catch (e: IOException) {
-            Log.d(tag,"songList file not found")
-        } finally {
-            if (songList.isEmpty()){
-                if (isNetworkAvailable()){
-                    Log.d(tag,"Network Available")
-                    downloadSongList()
-                }
-                else {
-                    Log.d(tag,"Network Unavailable")
-                    val snackbar = Snackbar.make(findViewById(android.R.id.content),
-                            "No internet connection.",
-                            Snackbar.LENGTH_INDEFINITE)
-                    snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
-                            R.color.colorAccent))
-                    snackbar.setAction(R.string.try_again, View.OnClickListener {
-                        //recheck internet connection and call DownloadJson if there is internet
-                    }).show()
-                }
-            } else {
-                // Do nothing? songList available
-            }
-
+        if (isNetworkAvailable()){
+            Log.d(tag,"Network Available")
+            downloadSongList()
         }
+        else {
+            Log.d(tag, "Network Unavailable")
+            val snackbar = Snackbar.make(findViewById(android.R.id.content),
+                    "No internet connection.",
+                    Snackbar.LENGTH_INDEFINITE)
+            snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
+                    R.color.colorAccent))
+            snackbar.setAction(R.string.try_again, View.OnClickListener {
+                //recheck internet connection and call DownloadJson if there is internet
+            }).show()
+        }
+
     }
 
     fun showListOfSongs(view: View) {
@@ -105,16 +97,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        /**try {
-            val fos = openFileOutput("songList", Context.MODE_PRIVATE)
-            val os = ObjectOutputStream(fos)
-            os.writeObject(MainActivity.songList)
-            os.close()
-            fos.close()
-        } finally {
-            //
+        if (timestamp!=null) {
+            val sharedPref = this.getSharedPreferences("com.cslp.anirudh.songle.MainActivity.pref",
+                    Context.MODE_PRIVATE)
+            val editor = sharedPref.edit()
+            editor.putString("timestamp", MainActivity.timestamp.toString())
+            editor.commit()
         }
-        **/
     }
 
 

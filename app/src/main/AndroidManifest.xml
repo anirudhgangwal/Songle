@@ -50,7 +50,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".GuessActivity"
-            android:label="@string/guess" />
+            android:label="@string/guess"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".CorrectActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

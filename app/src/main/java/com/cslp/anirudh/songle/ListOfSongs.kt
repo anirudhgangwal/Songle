@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.app.ListActivity
 import android.app.PendingIntent.getActivity
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ListView
@@ -15,7 +16,7 @@ import android.widget.Toast
  */
 
 class ListOfSongs : ListActivity() {
-
+    val tag = "ListOfSongs"
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
 
@@ -41,6 +42,7 @@ class ListOfSongs : ListActivity() {
 
 
         val intent = Intent(this,MapsActivity::class.java)
+        Log.i(tag,"Item clicked. Position = $position")
         intent.putExtra("ListClick",position)
         startActivity(intent)
 

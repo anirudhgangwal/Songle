@@ -42,7 +42,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     val permissionsRequestAccessFineLocation = 1
     var mLastLocation: Location? = null
     var song_number:Int? = null
-
+    var map1Layer: KmlLayer? = null
+    var map2Layer: KmlLayer? = null
+    var map3Layer: KmlLayer? = null
+    var map4Layer: KmlLayer? = null
 
     override fun onConnected(p0: Bundle?) {
         try{
@@ -90,6 +93,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             // Do something with current location
             // Particularly, maybe check if near any placemark, if so, call addWord()
             // addWord() - should use the point in palcemark to search for detials and add word.
+
         }
     }
 
@@ -132,11 +136,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
         textViewProgress.text = "Song ${song_number}: 0/0 Words "
 
-        val map1FileName = "song_"+correct(song_number!!)+"_map1"
-        Log.d(tag,"Attempting to open file with name: $map1FileName")
-        val map1File = openFileInput(map1FileName)
-        var map1Layer = KmlLayer(mMap,map1File,this)
-        map1Layer.addLayerToMap()
+        openCorrectMap()    // Load correct map appropriately.
+
 
         try {
             mMap.isMyLocationEnabled = true
@@ -148,6 +149,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
         changeMyLocationButtonPosition()     // Shift the button to the bottom
 
+    }
+
+    private fun openCorrectMap() {
+        // Open map k if MainActivity.songList[position-1] has map level = k
+        val map1FileName = "song_"+correct(song_number!!)+"_map1"
+        Log.d(tag,"Attempting to open file with name: $map1FileName")
+        val map1File = openFileInput(map1FileName)
+        map1Layer = KmlLayer(mMap,map1File,this)
+        map1Layer!!.addLayerToMap()
     }
 
     private fun correct(n:Int):String{

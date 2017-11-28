@@ -9,6 +9,9 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 /**
  * Created by anirudh on 07/11/17.
@@ -18,6 +21,8 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
         Log.i("SongDownloadListener",result)
         assert(result!=null)
         MainActivity.songList =  parseXml(result)
+
+
     }
 
 
@@ -34,7 +39,7 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(input : String): ArrayList<Song> {
         var songs = ArrayList<Song>()
-        val stream: InputStream = input.byteInputStream()   //ByteArrayInputStream(input.toByteArray(StandardCharsets.UTF_8))
+        val stream: InputStream = input.byteInputStream()
 
         val parser = Xml.newPullParser()
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,
@@ -54,6 +59,7 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
             }
             // Starts by looking for the entry tag
             if (parser.name == "Song") {
+                //MainActivity.timestamp = Timestamp.valueOf(parser.getAttributeValue(null,"timestamp"))
                 songs.add(readSong(parser))
             }
         }

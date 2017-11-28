@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import com.google.maps.android.kml.KmlLayer
+import java.sql.Timestamp
 
 /**
  * Created by anirudh on 06/11/17.
@@ -16,6 +17,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var unlocked = false
     var guessed = false // Must implement details
     var distance = 1.5
+    var mapLevel = 1
 
     fun getNumberName(): String = "Song " + number
 
@@ -24,12 +26,29 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     }
 
     init {
-        val url:String = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
-        // Send this url to download kml file
-        if (isNetworkAvailable()) {
-            val caller = MapDownloadListener(number.toInt(),"map1")
-            val kmlDownloader = DownloadXmlTask(caller)
-            kmlDownloader.execute(url)
+        // Download maps if timestamp shared in shared preference not same.
+        val pref = ctx.getSharedPreferences("com.cslp.anirudh.songle.MainActivity.pref",Context.MODE_PRIVATE)
+        val t = pref.getString("timestamp","-1")
+
+        val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
+
+        if (t=="-1"){
+            // Send this url to download kml file
+            if (isNetworkAvailable()) {
+                val caller = MapDownloadListener(number.toInt(),"map1")
+                val kmlDownloader = DownloadXmlTask(caller)
+                kmlDownloader.execute(url)
+            }
+        } else {
+            if (MainActivity.timestamp!!.before(Timestamp.valueOf(t))) {
+                if (isNetworkAvailable()) {
+                    val caller = MapDownloadListener(number.toInt(),"map1")
+                    val kmlDownloader = DownloadXmlTask(caller)
+                    kmlDownloader.execute(url)
+                } else {
+                    // Do nothing. time stamp is latest.
+                }
+            }
         }
 
     }

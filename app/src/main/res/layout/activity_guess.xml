@@ -37,60 +37,74 @@
         android:name="android.app.ListFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
 
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/sentence"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4">
+        app:layout_constraintTop_toBottomOf="@+id/button6">
 
     </fragment>
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:elevation="4dp"
-        android:paddingLeft="6dp"
-        android:text="@string/build_sentence"
-        app:layout_constraintEnd_toStartOf="@+id/button6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9" />
-
-    <TextView
-        android:id="@+id/textView9"
-        android:layout_width="0dp"
-        android:layout_height="31dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:alpha="0.5"
-        android:background="@android:color/holo_orange_dark"
-        android:paddingLeft="4dp"
-        android:paddingTop="3dp"
-        android:text="@string/collected_words"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="6dp"
+        android:padding="4dp"
+        android:text="@string/build_sentence"
+        app:layout_constraintBottom_toTopOf="@+id/list"
+        app:layout_constraintEnd_toStartOf="@+id/button6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/button9" />
 
     <Button
         android:id="@+id/button6"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="115dp"
-        android:layout_height="31dp"
-        android:elevation="4dp"
+        android:layout_height="0dp"
+        android:elevation="6dp"
         android:onClick="resetSentence"
+        android:padding="4dp"
         android:text="@string/reset_sentence"
         android:textSize="10sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/button9"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="158dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:padding="4dp"
+        android:text="@string/hint"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.036"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
+
+    <TextView
+        android:id="@+id/sentence"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@android:color/holo_red_light"
+        android:elevation="6dp"
+        android:text="@string/sentence"
+        android:textAlignment="center"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

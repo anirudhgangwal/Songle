@@ -16,6 +16,7 @@ class GuessActivity : AppCompatActivity() {
 
     var song_number:Int? = null // MainActivity.songList subtract one for correct song
     val tag = "GuessActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guess)
@@ -52,13 +53,14 @@ class GuessActivity : AppCompatActivity() {
         listFragment.listAdapter = myAdapter
 
         listFragment.listView.onItemClickListener = OnItemClickListener { a, v, position, id ->
-            textView4.text = textView4.text.toString() + " " + a.getItemAtPosition(position).toString()
+            sentence.text = sentence.text.toString() + " " + a.getItemAtPosition(position).toString()
+            // Allow only 120 cahracters?
         }
 
     }
 
     fun resetSentence(view:View){
-        textView4.text = """Try building a sentence... (click words): """
+        sentence.text = "Sentence:  "
     }
 
     override fun onStart() {
@@ -67,8 +69,10 @@ class GuessActivity : AppCompatActivity() {
 
 
     fun showCorrect(view: View){
+        // Checks if the guess is correct and shows Congratulation screen.
+        // Lets user know if song was incorrect.
         var correctGuess = MainActivity.songList[song_number!!-1].title
-        if (editText.text.toString() == correctGuess) {
+        if (editText.text.toString().toLowerCase() == correctGuess.toLowerCase()) {
             val intent = Intent(this,CorrectActivity::class.java)
             intent.putExtra("songNumber",song_number!!)
             startActivity(intent)
