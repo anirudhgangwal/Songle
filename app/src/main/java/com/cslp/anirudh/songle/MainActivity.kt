@@ -31,14 +31,16 @@ import android.R.id.edit
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        var timestamp: Timestamp? = null
         var songList = ArrayList<Song>()
     }
 
     val tag = "MainActivity"
+    var files:List<String>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        files = fileList().toList()
 
     }
 
@@ -81,6 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isNetworkAvailable(): Boolean {
+
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
@@ -97,13 +100,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (timestamp!=null) {
-            val sharedPref = this.getSharedPreferences("com.cslp.anirudh.songle.MainActivity.pref",
-                    Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            editor.putString("timestamp", MainActivity.timestamp.toString())
-            editor.commit()
-        }
+
     }
 
 

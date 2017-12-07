@@ -42,10 +42,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     val permissionsRequestAccessFineLocation = 1
     var mLastLocation: Location? = null
     var song_number:Int? = null
-    var map1Layer: KmlLayer? = null
-    var map2Layer: KmlLayer? = null
-    var map3Layer: KmlLayer? = null
-    var map4Layer: KmlLayer? = null
+    var mapLayer: KmlLayer? = null
+
 
     override fun onConnected(p0: Bundle?) {
         try{
@@ -153,11 +151,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
     private fun openCorrectMap() {
         // Open map k if MainActivity.songList[position-1] has map level = k
-        val map1FileName = "song_"+correct(song_number!!)+"_map1"
-        Log.d(tag,"Attempting to open file with name: $map1FileName")
-        val map1File = openFileInput(map1FileName)
-        map1Layer = KmlLayer(mMap,map1File,this)
-        map1Layer!!.addLayerToMap()
+        val mapFileName = "song_"+correct(song_number!!)+"_map${MainActivity.songList[song_number!!].mapLevel}"
+        Log.d(tag,"Attempting to open file with name: $mapFileName")
+        val map1File = openFileInput(mapFileName)
+        mapLayer = KmlLayer(mMap,map1File,this)
+        // Here - Remove words from Layer which are already caught.
+        mapLayer!!.addLayerToMap()
     }
 
     private fun correct(n:Int):String{

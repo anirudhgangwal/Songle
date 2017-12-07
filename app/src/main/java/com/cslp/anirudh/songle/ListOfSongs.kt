@@ -34,9 +34,6 @@ class ListOfSongs : ListActivity() {
 
     override fun onListItemClick(l: ListView?, v: View?, position: Int, id: Long) {
         super.onListItemClick(l, v, position, id)
-        // Instead of toast, open another ativity like
-        // showSongMap(songs[position])
-        // Toast.makeText(this, "Song: " + position, Toast.LENGTH_SHORT).show();
 
         // Implementation
 
@@ -50,7 +47,7 @@ class ListOfSongs : ListActivity() {
 
 
     private fun setStatus(lst:ArrayList<Song>){
-        for (i in 0..2) {
+        for (i in 0..18) {
             lst[i].unlocked = true
         }
     }

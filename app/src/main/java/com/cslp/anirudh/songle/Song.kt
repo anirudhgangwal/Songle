@@ -18,6 +18,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var guessed = false // Must implement details
     var distance = 1.5
     var mapLevel = 1
+    var words: List<String>? = null
 
     fun getNumberName(): String = "Song " + number
 
@@ -26,32 +27,55 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     }
 
     init {
-        // Download maps if timestamp shared in shared preference not same.
-        val pref = ctx.getSharedPreferences("com.cslp.anirudh.songle.MainActivity.pref",Context.MODE_PRIVATE)
-        val t = pref.getString("timestamp","-1")
 
-        val url = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
+        val urlMap1 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
+        val urlMap2 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map2.kml"
+        val urlMap3 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map3.kml"
+        val urlMap4 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map4.kml"
+        val urlMap5 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map5.kml"
 
-        if (t=="-1"){
-            // Send this url to download kml file
-            if (isNetworkAvailable()) {
-                val caller = MapDownloadListener(number.toInt(),"map1")
-                val kmlDownloader = DownloadXmlTask(caller)
-                kmlDownloader.execute(url)
-            }
-        } else {
-            if (MainActivity.timestamp!!.before(Timestamp.valueOf(t))) {
-                if (isNetworkAvailable()) {
-                    val caller = MapDownloadListener(number.toInt(),"map1")
-                    val kmlDownloader = DownloadXmlTask(caller)
-                    kmlDownloader.execute(url)
-                } else {
-                    // Do nothing. time stamp is latest.
-                }
-            }
+        val urlLyrics = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/lyrics.txt"
+
+        if (isNetworkAvailable()) {
+
+            val caller = FileDownloadListener(number.toInt())
+            val fileDownloader = DownloadXmlTask(caller)
+            fileDownloader.execute(urlLyrics)
+
+            val caller1 = MapDownloadListener(number.toInt(),1)
+            val kmlDownloader1 = DownloadXmlTask(caller1)
+            kmlDownloader1.execute(urlMap1)
+
+            val caller2 = MapDownloadListener(number.toInt(),2)
+            val kmlDownloader2 = DownloadXmlTask(caller2)
+            kmlDownloader2.execute(urlMap2)
+
+            val caller3 = MapDownloadListener(number.toInt(),3)
+            val kmlDownloader3 = DownloadXmlTask(caller3)
+            kmlDownloader3.execute(urlMap3)
+
+            val caller4 = MapDownloadListener(number.toInt(),4)
+            val kmlDownloader4 = DownloadXmlTask(caller4)
+            kmlDownloader4.execute(urlMap4)
+
+            val caller5 = MapDownloadListener(number.toInt(),5)
+            val kmlDownloader5 = DownloadXmlTask(caller5)
+            kmlDownloader5.execute(urlMap5)
+
         }
-
     }
+
+    fun saveLyrics(fileString: String){
+        val FILENAME = "${number}Lyrics"
+        Log.d(tag,"Writing file with name: $FILENAME")
+        val string = fileString
+
+        val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
+        fos.write(string.toByteArray())
+        fos.close()
+    }
+
+
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -59,8 +83,8 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
-    fun setMap1(kmlString: String){
-        val FILENAME = "song_"+number+"_map1"
+    fun setMap(kmlString: String, mapNum:Int){
+        val FILENAME = "song_"+number+"_map$mapNum"
         Log.d(tag,"Writing file with name: $FILENAME")
         val string = kmlString
 
@@ -69,12 +93,17 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         fos.close()
     }
 
+
 }
 
-class MapDownloadListener(val number: Int,val description:String) : DownloadCompleteListener {
+class MapDownloadListener(val number: Int,val description:Int) : DownloadCompleteListener {
     override fun downloadComplete(kmlString: String) {
-        if (description == "map1")
-            MainActivity.songList[number-1].setMap1(kmlString)
+        MainActivity.songList[number-1].setMap(kmlString,description)
+    }
+}
 
+class FileDownloadListener(val number: Int) : DownloadCompleteListener {
+    override fun downloadComplete(kmlString: String) {
+        MainActivity.songList[number-1].saveLyrics(kmlString)
     }
 }

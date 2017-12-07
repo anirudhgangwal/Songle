@@ -22,7 +22,6 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
         assert(result!=null)
         MainActivity.songList =  parseXml(result)
 
-
     }
 
 
@@ -59,7 +58,6 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
             }
             // Starts by looking for the entry tag
             if (parser.name == "Song") {
-                //MainActivity.timestamp = Timestamp.valueOf(parser.getAttributeValue(null,"timestamp"))
                 songs.add(readSong(parser))
             }
         }

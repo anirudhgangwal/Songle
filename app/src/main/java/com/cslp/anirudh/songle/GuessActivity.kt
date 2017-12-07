@@ -34,19 +34,7 @@ class GuessActivity : AppCompatActivity() {
         strList.add("Pleased")
         strList.add("problem")
         strList.add("never")
-        /** [chorus]
-        8	Woo-hoo
-        9	When I feel heavy-metal
-        10	And I'm pins and I'm needles
-        11	Well, I lie and I'm easy
-        12	All the time but I am never sure
-        13	Why I need you
-        14	Pleased to meet you
-        15
-        16	I got my head down
-        17	When I was young
-        18	It's not my problem
-        19	It's not my problem*/
+
         var listFragment = fragmentManager.findFragmentById(R.id.list) as ListFragment
         var myAdapter = ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,strList)
@@ -61,6 +49,10 @@ class GuessActivity : AppCompatActivity() {
 
     fun resetSentence(view:View){
         sentence.text = "Sentence:  "
+    }
+
+    fun hint(view:View) {
+        TODO("Give hint. Call hint from Song maybe?")
     }
 
     override fun onStart() {
