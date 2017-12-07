@@ -27,6 +27,7 @@ import com.google.maps.android.kml.KmlLayer
 import kotlinx.android.synthetic.main.activity_maps.*
 import android.widget.RelativeLayout
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.kml.KmlPlacemark
 import com.google.maps.android.kml.KmlPoint
 
@@ -45,6 +46,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     var mLastLocation: Location? = null
     var song_number:Int? = null
     var mapLayer: KmlLayer? = null
+
+    var markerList = HashMap<Marker,String>()
 
 
     override fun onConnected(p0: Bundle?) {
@@ -93,7 +96,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             // Do something with current location
             // Particularly, maybe check if near any placemark, if so, call addWord()
             // addWord() - should use the point in palcemark to search for detials and add word.
-
+            val results = FloatArray(10)
+            var removeMarker: Marker? = null
+            for ((m,w) in markerList) {
+                Location.distanceBetween(current.latitude,current.longitude,
+                        m.position.latitude,m.position.longitude,results)
+                if (results[0] <= 10f) {
+                    m.remove()
+                    MainActivity.songList[song_number!!].words.add(w)
+                    Toast.makeText(this, "Word Added: ${w}", Toast.LENGTH_SHORT).show()
+                    removeMarker = m    // No need to check distance with this marker again.
+                }
+            }
+            markerList.remove(removeMarker) // removing this marker from list
         }
     }
 
@@ -164,25 +179,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         val container = mapLayer!!.getContainers().iterator().next();
         for (placemark in container.placemarks){
             val point = placemark.geometry as KmlPoint
-            val title = placemark.getProperty("description")
-            var style:String
-            val styleUrl = placemark.styleId
+            val name:String = placemark.getProperty("name")
+            if (name !in MainActivity.songList[song_number!!].words) {
+                val title = placemark.getProperty("description")
+                var style: String
+                val styleUrl = placemark.styleId
 
-            if (styleUrl == "#unclassified")
-                style = "whtblank"
-            else if (styleUrl == "#boring")
-                style = "ylwblank"
-            else if (styleUrl == "#notboring")
-                style = "ylwcircle"
-            else if (styleUrl == "#interesting")
-                style = "orangediamond"
-            else
-                style = "redstars"
+                if (styleUrl == "#unclassified")
+                    style = "whtblank"
+                else if (styleUrl == "#boring")
+                    style = "ylwblank"
+                else if (styleUrl == "#notboring")
+                    style = "ylwcircle"
+                else if (styleUrl == "#interesting")
+                    style = "orangediamond"
+                else
+                    style = "redstars"
 
-            val drawableId = resources.getIdentifier(style, "drawable", packageName)
+                val drawableId = resources.getIdentifier(style, "drawable", packageName)
 
-            mMap.addMarker(MarkerOptions().position(point.geometryObject)
-                    .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
+                val m = mMap.addMarker(MarkerOptions().position(point.geometryObject)
+                        .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
+                markerList[m] = name
+            }
 
         }
 

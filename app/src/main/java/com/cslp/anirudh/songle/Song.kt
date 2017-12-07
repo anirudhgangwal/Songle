@@ -18,7 +18,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var guessed = false // Must implement details
     var distance = 1.5
     var mapLevel = 1
-    var words: List<String>? = null
+    var words: MutableList<String> = mutableListOf()
 
     fun getNumberName(): String = "Song " + number
 
@@ -88,14 +88,6 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     }
 
-
-
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected
-    }
-
     fun setMap(kmlString: String, mapNum:Int){
         val FILENAME = "song_"+number+"_map$mapNum"
 
@@ -107,6 +99,13 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         fos.close()
 
     }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
 
 
 }
