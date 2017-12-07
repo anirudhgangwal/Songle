@@ -40,8 +40,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        files = fileList().toList()
-
     }
 
     override fun onStart() {

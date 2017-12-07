@@ -38,41 +38,54 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
         if (isNetworkAvailable()) {
 
-            val caller = FileDownloadListener(number.toInt())
-            val fileDownloader = DownloadXmlTask(caller)
-            fileDownloader.execute(urlLyrics)
+            if ("${number}Lyrics" !in ctx.fileList()) {
+                val caller = FileDownloadListener(number.toInt())
+                val fileDownloader = DownloadXmlTask(caller)
+                fileDownloader.execute(urlLyrics)
+            }
 
-            val caller1 = MapDownloadListener(number.toInt(),1)
-            val kmlDownloader1 = DownloadXmlTask(caller1)
-            kmlDownloader1.execute(urlMap1)
 
-            val caller2 = MapDownloadListener(number.toInt(),2)
-            val kmlDownloader2 = DownloadXmlTask(caller2)
-            kmlDownloader2.execute(urlMap2)
+            if ("song_"+number+"_map1" !in ctx.fileList()) {
+                val caller1 = MapDownloadListener(number.toInt(), 1)
+                val kmlDownloader1 = DownloadXmlTask(caller1)
+                kmlDownloader1.execute(urlMap1)
+            }
 
-            val caller3 = MapDownloadListener(number.toInt(),3)
-            val kmlDownloader3 = DownloadXmlTask(caller3)
-            kmlDownloader3.execute(urlMap3)
+            if ("song_"+number+"_map2" !in ctx.fileList()) {
+                val caller2 = MapDownloadListener(number.toInt(), 2)
+                val kmlDownloader2 = DownloadXmlTask(caller2)
+                kmlDownloader2.execute(urlMap2)
+            }
 
-            val caller4 = MapDownloadListener(number.toInt(),4)
-            val kmlDownloader4 = DownloadXmlTask(caller4)
-            kmlDownloader4.execute(urlMap4)
+            if ("song_"+number+"_map3" !in ctx.fileList()) {
+                val caller3 = MapDownloadListener(number.toInt(), 3)
+                val kmlDownloader3 = DownloadXmlTask(caller3)
+                kmlDownloader3.execute(urlMap3)
+            }
 
-            val caller5 = MapDownloadListener(number.toInt(),5)
-            val kmlDownloader5 = DownloadXmlTask(caller5)
-            kmlDownloader5.execute(urlMap5)
-
+            if ("song_"+number+"_map4" !in ctx.fileList()) {
+                val caller4 = MapDownloadListener(number.toInt(), 4)
+                val kmlDownloader4 = DownloadXmlTask(caller4)
+                kmlDownloader4.execute(urlMap4)
+            }
+            if ("song_"+number+"_map5" !in ctx.fileList()) {
+                val caller5 = MapDownloadListener(number.toInt(), 5)
+                val kmlDownloader5 = DownloadXmlTask(caller5)
+                kmlDownloader5.execute(urlMap5)
+            }
         }
     }
 
     fun saveLyrics(fileString: String){
         val FILENAME = "${number}Lyrics"
-        Log.d(tag,"Writing file with name: $FILENAME")
+
+        Log.d(tag, "Writing file with name: $FILENAME")
         val string = fileString
 
         val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
         fos.write(string.toByteArray())
         fos.close()
+
     }
 
 
@@ -85,25 +98,27 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     fun setMap(kmlString: String, mapNum:Int){
         val FILENAME = "song_"+number+"_map$mapNum"
-        Log.d(tag,"Writing file with name: $FILENAME")
+
+        Log.d(tag, "Writing file with name: $FILENAME")
         val string = kmlString
 
         val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
         fos.write(string.toByteArray())
         fos.close()
+
     }
 
 
 }
 
 class MapDownloadListener(val number: Int,val description:Int) : DownloadCompleteListener {
-    override fun downloadComplete(kmlString: String) {
-        MainActivity.songList[number-1].setMap(kmlString,description)
+    override fun downloadComplete(result: String) {
+        MainActivity.songList[number-1].setMap(result,description)
     }
 }
 
 class FileDownloadListener(val number: Int) : DownloadCompleteListener {
-    override fun downloadComplete(kmlString: String) {
-        MainActivity.songList[number-1].saveLyrics(kmlString)
+    override fun downloadComplete(result: String) {
+        MainActivity.songList[number-1].saveLyrics(result)
     }
 }

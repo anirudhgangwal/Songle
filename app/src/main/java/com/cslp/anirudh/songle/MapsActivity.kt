@@ -26,7 +26,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.kml.KmlLayer
 import kotlinx.android.synthetic.main.activity_maps.*
 import android.widget.RelativeLayout
-
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.maps.android.kml.KmlPlacemark
+import com.google.maps.android.kml.KmlPoint
 
 
 @Suppress("DEPRECATION")
@@ -155,8 +157,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         Log.d(tag,"Attempting to open file with name: $mapFileName")
         val map1File = openFileInput(mapFileName)
         mapLayer = KmlLayer(mMap,map1File,this)
-        // Here - Remove words from Layer which are already caught.
-        mapLayer!!.addLayerToMap()
+        // Here - Only show words which are not in caught words.
+
+
+        //First container in the kmlLayer
+        val container = mapLayer!!.getContainers().iterator().next();
+        for (placemark in container.placemarks){
+            val point = placemark.geometry as KmlPoint
+            val title = placemark.getProperty("description")
+            var style:String
+            val styleUrl = placemark.styleId
+
+            if (styleUrl == "#unclassified")
+                style = "whtblank"
+            else if (styleUrl == "#boring")
+                style = "ylwblank"
+            else if (styleUrl == "#notboring")
+                style = "ylwcircle"
+            else if (styleUrl == "#interesting")
+                style = "orangediamond"
+            else
+                style = "redstars"
+
+            val drawableId = resources.getIdentifier(style, "drawable", packageName)
+
+            mMap.addMarker(MarkerOptions().position(point.geometryObject)
+                    .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
+
+        }
+
     }
 
     private fun correct(n:Int):String{
