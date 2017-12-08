@@ -4,6 +4,8 @@ import android.content.Context
 import android.R.attr.name
 import android.util.Log
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.Paths
 
 
 /**
@@ -15,22 +17,27 @@ class Lyrics (val ctx:Context,val song_number: Int) {
 
     fun getWord(location:String):String{
         val FILENAME = "${correct(song_number)}Lyrics"
+
         if (FILENAME in ctx.fileList()){
-            val row = location.split(":")[0].toInt()
-            val column = location.split(":")[1].toInt()
+            val file = ctx.openFileInput(FILENAME)
 
-            var file:InputStream = ctx.openFileInput(FILENAME)
+            val reader = InputStreamReader(file)
+            var lines = reader.readLines()
 
-            val lines = BufferedReader(InputStreamReader(file))
-            val buf = StringBuffer()
-            var line:String? = lines.readLine()
-            while (line!=null){
-                buf.append(line+"\n")
-                line = lines.readLine()
-            }
-            println(buf.toString())
+            var row = -1
+            var column = -1
+            row = location.split(":")[0].toInt()
+            column = location.split(":")[1].toInt()
+            println("location = $location row = $row col = $column ")
+            val line = lines[row-1].split("\t")[1]
+            println("line = $line")
 
-            return "some word at $location"
+            file.close()
+
+            return line.split(" ")[column-1] + " " + location
+
+
+
         } else {
             return "ERROR: LYRICS NOT FOUND."
         }

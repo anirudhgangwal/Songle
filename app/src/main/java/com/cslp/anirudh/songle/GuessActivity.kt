@@ -48,8 +48,7 @@ class GuessActivity : AppCompatActivity() {
     }
 
     fun hint(view:View) {
-        //var lyr = Lyrics(this)
-        //lyr.getWord(song_number!!,"")
+        TODO("Parse all words in map 5.")
     }
 
     override fun onStart() {

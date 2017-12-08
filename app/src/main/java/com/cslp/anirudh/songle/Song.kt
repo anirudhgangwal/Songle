@@ -47,8 +47,8 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         if (isNetworkAvailable()) {
 
             if ("${number}Lyrics" !in ctx.fileList()) {
-                val caller = FileDownloadListener(number.toInt())
-                val fileDownloader = DownloadXmlTask(caller)
+                val caller = WordsDownloadListener(number.toInt())
+                val fileDownloader = DownloadWordsTask(caller)
                 fileDownloader.execute(urlLyrics)
             }
 
@@ -84,14 +84,21 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         }
     }
 
-    fun saveLyrics(fileString: String){
+    fun saveLyrics(result: List<String>){
         val FILENAME = "${number}Lyrics"
 
         Log.d(tag, "Writing file with name: $FILENAME")
-        val string = fileString
+
 
         val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
-        fos.write(string.toByteArray())
+        var lines = ""
+        for (line in result){
+            //println(line)
+            lines = lines + line + "\n"
+        }
+        //println("lines:\n"+lines)
+        fos.write(lines.toByteArray())
+        //fos.write(string.toByteArray())
         fos.close()
 
     }
@@ -107,6 +114,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         fos.close()
 
     }
+
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -124,8 +132,9 @@ class MapDownloadListener(val number: Int,val description:Int) : DownloadComplet
     }
 }
 
-class FileDownloadListener(val number: Int) : DownloadCompleteListener {
-    override fun downloadComplete(result: String) {
+
+class WordsDownloadListener(val number:Int) : DownloadCompleteListener2 {
+    override fun downloadComplete(result: List<String>) {
         MainActivity.songList[number-1].saveLyrics(result)
     }
 }
