@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import com.google.maps.android.kml.KmlLayer
+import java.io.FileInputStream
+import java.io.ObjectInputStream
 import java.sql.Timestamp
 
 /**
@@ -28,13 +30,19 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     init {
 
+        val sharedPref = ctx.getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
+        val set = sharedPref.getStringSet(number.toInt().toString(),null)
+        if (set != null){
+            words.addAll(set)
+        }
+
         val urlMap1 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
         val urlMap2 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map2.kml"
         val urlMap3 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map3.kml"
         val urlMap4 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map4.kml"
         val urlMap5 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map5.kml"
 
-        val urlLyrics = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/lyrics.txt"
+        val urlLyrics = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/words.txt"
 
         if (isNetworkAvailable()) {
 

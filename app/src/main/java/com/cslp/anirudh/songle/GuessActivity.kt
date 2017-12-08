@@ -1,6 +1,7 @@
 package com.cslp.anirudh.songle
 
 import android.app.ListFragment
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -24,20 +25,15 @@ class GuessActivity : AppCompatActivity() {
         song_number = intent.getIntExtra("songNumber",0)
         Log.d(tag,"song_number = $song_number")
 
-        val strList = ArrayList<String>()
-        strList.add("all")
-        strList.add("the")
-        strList.add("When")
-        strList.add("time")
-        strList.add("down")
-        strList.add("easy")
-        strList.add("Pleased")
-        strList.add("problem")
-        strList.add("never")
+
+        var lyr = Lyrics(this,song_number!!)
+        var listOfWords = MainActivity.songList[song_number!!-1].words.map { w ->
+            lyr.getWord(w)
+        }
 
         var listFragment = fragmentManager.findFragmentById(R.id.list) as ListFragment
         var myAdapter = ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,strList)
+                android.R.layout.simple_list_item_1,listOfWords)
         listFragment.listAdapter = myAdapter
 
         listFragment.listView.onItemClickListener = OnItemClickListener { a, v, position, id ->
@@ -52,7 +48,8 @@ class GuessActivity : AppCompatActivity() {
     }
 
     fun hint(view:View) {
-        TODO("Give hint. Call hint from Song maybe?")
+        //var lyr = Lyrics(this)
+        //lyr.getWord(song_number!!,"")
     }
 
     override fun onStart() {

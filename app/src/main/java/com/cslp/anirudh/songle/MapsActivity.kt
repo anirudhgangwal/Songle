@@ -1,7 +1,10 @@
 package com.cslp.anirudh.songle
 
 import android.Manifest
+import android.app.PendingIntent.getActivity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
@@ -30,6 +33,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.kml.KmlPlacemark
 import com.google.maps.android.kml.KmlPoint
+import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 
 
 @Suppress("DEPRECATION")
@@ -103,7 +109,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                         m.position.latitude,m.position.longitude,results)
                 if (results[0] <= 10f) {
                     m.remove()
-                    MainActivity.songList[song_number!!].words.add(w)
+                    MainActivity.songList[song_number!!-1].words.add(w)
                     Toast.makeText(this, "Word Added: ${w}", Toast.LENGTH_SHORT).show()
                     removeMarker = m    // No need to check distance with this marker again.
                 }
@@ -168,7 +174,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
     private fun openCorrectMap() {
         // Open map k if MainActivity.songList[position-1] has map level = k
-        val mapFileName = "song_"+correct(song_number!!)+"_map${MainActivity.songList[song_number!!].mapLevel}"
+        val mapFileName = "song_"+correct(song_number!!)+"_map${MainActivity.
+                songList[song_number!!-1].mapLevel}"
         Log.d(tag,"Attempting to open file with name: $mapFileName")
         val map1File = openFileInput(mapFileName)
         mapLayer = KmlLayer(mMap,map1File,this)
@@ -180,7 +187,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         for (placemark in container.placemarks){
             val point = placemark.geometry as KmlPoint
             val name:String = placemark.getProperty("name")
-            if (name !in MainActivity.songList[song_number!!].words) {
+            if (name !in MainActivity.songList[song_number!!-1].words) {
                 val title = placemark.getProperty("description")
                 var style: String
                 val styleUrl = placemark.styleId
@@ -240,6 +247,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         super.onStop()
         if (mGoogleApiClient.isConnected)
             mGoogleApiClient.disconnect()
+
+        // MainActivity.songList[song_number!!-1].words
+        val sharedPref = getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        val set = MainActivity.songList[song_number!!-1].words.toSet()
+        editor.putStringSet(song_number.toString(), set);
+        editor.commit()
+
     }
 
     private fun changeMyLocationButtonPosition(){
