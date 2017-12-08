@@ -21,8 +21,11 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var distance = 1.5
     var mapLevel = 1
     var words: MutableList<String> = mutableListOf()
+    var mapWordCount = HashMap<Int,Int>()
 
-    fun getNumberName(): String = "Song " + number
+
+
+    fun getNumberName(): String = "Puzzle " + number
 
     override fun toString(): String {
         return("Numer: $number  Artist: $artist Title: $title   Link: $link")
@@ -30,12 +33,52 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     init {
 
+        updateGuessedStatus()
+
+        if (number.toInt() <= 5)
+            unlocked = true
+        else {
+            // check shared pref.
+        }
+
+        updateMapLevel()
+        updateWords()
+
+
+
+
+        initialMapsAndLyricsDownload()  // only if not already downloaded om the first run.
+        //initialWordCount()  // only if not calculated in the first run.
+    }
+
+
+
+    private fun updateMapLevel(){
+        val sharedPref = ctx.getSharedPreferences("mapLevel",Context.MODE_PRIVATE)
+        mapLevel = sharedPref.getInt(number.toInt().toString(),1)
+        Log.d(tag,"Song: $number mapLevel = $mapLevel")
+    }
+
+    private fun updateWords(){
         val sharedPref = ctx.getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
         val set = sharedPref.getStringSet(number.toInt().toString(),null)
         if (set != null){
             words.addAll(set)
         }
+    }
 
+    private fun updateGuessedStatus(){
+        val sharedPref2 = ctx.getSharedPreferences("guessedSongs",Context.MODE_PRIVATE)
+        val isGuessed = sharedPref2.getBoolean(number.toInt().toString(),false)
+        guessed = isGuessed
+
+        if (guessed) {
+            percentageComplete = "100"
+        }
+        //TODO("Calculate percentage, need map 5 words.")
+    }
+
+    private fun initialMapsAndLyricsDownload(){
         val urlMap1 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
         val urlMap2 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map2.kml"
         val urlMap3 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map3.kml"
@@ -121,7 +164,6 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
-
 
 
 }

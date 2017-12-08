@@ -108,7 +108,7 @@
         android:layout_marginTop="8dp"
         android:alpha=".8"
         android:text="@string/home"
-        android:onClick="backToSongList"
+        android:onClick="backToHome"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

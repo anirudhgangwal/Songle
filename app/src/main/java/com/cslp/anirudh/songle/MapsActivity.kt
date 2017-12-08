@@ -3,6 +3,7 @@ package com.cslp.anirudh.songle
 import android.Manifest
 import android.app.PendingIntent.getActivity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -109,12 +111,53 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                         m.position.latitude,m.position.longitude,results)
                 if (results[0] <= 10f) {
                     m.remove()
+                    val lyr = Lyrics(this,song_number!!)
+                    val word = lyr.getWord(w)
                     MainActivity.songList[song_number!!-1].words.add(w)
-                    Toast.makeText(this, "Word Added: ${w}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Word Added: ${word}", Toast.LENGTH_SHORT).show()
                     removeMarker = m    // No need to check distance with this marker again.
                 }
             }
             markerList.remove(removeMarker) // removing this marker from list
+
+            updateProgressBar() // progress bar need to update
+
+            updateLevel()
+
+        }
+    }
+
+    private fun makeAlert(message: String,title:String = "You have leveled up!"){
+        val alertDialog = AlertDialog.Builder(this).create()
+        alertDialog.setTitle(title)
+        alertDialog.setMessage(message)
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
+        ) { dialog, which -> dialog.dismiss() }
+        alertDialog.show()
+    }
+
+    private fun updateLevel() {
+        val wordsCollected = MainActivity.songList[song_number!!-1].words.size
+        val mapLevel = MainActivity.songList[song_number!!-1].mapLevel
+        val totalWordsinLevel = MainActivity.songList[song_number!!-1].
+                mapWordCount[MainActivity.songList[song_number!!-1].mapLevel]
+
+        if (mapLevel < 4){
+            if (wordsCollected == totalWordsinLevel){
+                MainActivity.songList[song_number!!-1].mapLevel += 1
+                when (MainActivity.songList[song_number!!-1].mapLevel) {
+                    2 -> makeAlert("You can now prioritise between \"boring\" and \"notboring\" words!")
+                    3 -> makeAlert("You are now shown interesting words!")
+                    4 -> makeAlert("This is the last lot of words from lyrics!")
+                    else -> makeAlert("ERROR: PLEASE REPORT.")
+                }
+                updateProgressBar() // show level has changed on progress bar
+                openCorrectMap()  // open next level of map
+            }
+        } else {
+            if (wordsCollected == totalWordsinLevel){
+                makeAlert("You have collected all the lyrics of this song! Try and guess now!","All Words Collected")
+            }
         }
     }
 
@@ -155,7 +198,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(central_area, 16F))
 
 
-        textViewProgress.text = "Song ${song_number}: 0/0 Words "
+        //textViewProgress.text = "Song ${song_number}: 0/0 Words "
 
         openCorrectMap()    // Load correct map appropriately.
 
@@ -177,14 +220,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         val mapFileName = "song_"+correct(song_number!!)+"_map${MainActivity.
                 songList[song_number!!-1].mapLevel}"
         Log.d(tag,"Attempting to open file with name: $mapFileName")
-        val map1File = openFileInput(mapFileName)
-        mapLayer = KmlLayer(mMap,map1File,this)
+        val mapFile = openFileInput(mapFileName)
+        mapLayer = KmlLayer(mMap,mapFile,this)
         // Here - Only show words which are not in caught words.
 
 
         //First container in the kmlLayer
+        var counter = 0
         val container = mapLayer!!.getContainers().iterator().next();
         for (placemark in container.placemarks){
+            counter = counter + 1
             val point = placemark.geometry as KmlPoint
             val name:String = placemark.getProperty("name")
             if (name !in MainActivity.songList[song_number!!-1].words) {
@@ -209,9 +254,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                         .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
                 markerList[m] = name
             }
-
         }
+        MainActivity.songList[song_number!!-1].
+                mapWordCount[MainActivity.songList[song_number!!-1].mapLevel] = counter
+        updateProgressBar()
+    }
 
+    private fun updateProgressBar(){
+        val wordsCollected = MainActivity.songList[song_number!!-1].words.size
+        val mapLevel = MainActivity.songList[song_number!!-1].mapLevel
+        val totalWordsinLevel = MainActivity.songList[song_number!!-1].
+                mapWordCount[MainActivity.songList[song_number!!-1].mapLevel]
+
+        textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinLevel} Words Lvl: ${mapLevel}"
     }
 
     private fun correct(n:Int):String{
@@ -248,13 +303,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         if (mGoogleApiClient.isConnected)
             mGoogleApiClient.disconnect()
 
-        // MainActivity.songList[song_number!!-1].words
+        // Collected words
         val sharedPref = getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         val set = MainActivity.songList[song_number!!-1].words.toSet()
         editor.putStringSet(song_number.toString(), set);
         editor.commit()
 
+        // Map Level
+        val sharedPref2 = getSharedPreferences("mapLevel",Context.MODE_PRIVATE)
+        val editor2 = sharedPref2.edit()
+        editor2.putInt(song_number.toString(),MainActivity.songList[song_number!!-1].mapLevel)
+        editor2.commit()
     }
 
     private fun changeMyLocationButtonPosition(){

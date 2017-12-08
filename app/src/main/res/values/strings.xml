@@ -24,7 +24,7 @@
     <string name="artist">Artist:</string>
     <string name="distance_song">Distance covered for this song:</string>
     <string name="video">Video</string>
-    <string name="home">Back to Song List</string>
+    <string name="home">Back to Home</string>
     <string name="hint">Get a hint!</string>
     <string name="sentence">Sentence:</string>
 </resources>

@@ -57,8 +57,15 @@ class CorrectActivity : AppCompatActivity() {
         return id
     }
 
-    fun backToSongList(view: View){
-        val intent = Intent(this,ListOfSongs::class.java)
+    fun backToHome(view: View){
+        val intent = Intent(this,MainActivity::class.java)
         startActivity(intent)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this,MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

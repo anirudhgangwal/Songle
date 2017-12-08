@@ -61,6 +61,13 @@ class GuessActivity : AppCompatActivity() {
         // Lets user know if song was incorrect.
         var correctGuess = MainActivity.songList[song_number!!-1].title
         if (editText.text.toString().toLowerCase() == correctGuess.toLowerCase()) {
+            MainActivity.songList[song_number!!-1].guessed = true
+
+            val sharedPref = getSharedPreferences("guessedSongs",Context.MODE_PRIVATE)
+            val editor = sharedPref.edit()
+            editor.putBoolean(song_number.toString(), true);
+            editor.commit()
+
             val intent = Intent(this,CorrectActivity::class.java)
             intent.putExtra("songNumber",song_number!!)
             startActivity(intent)

@@ -44,7 +44,11 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
         val text1 = twoLineListItem.text1
         val text2 = twoLineListItem.text2
 
-        text1.text = (songs[position].getNumberName())
+        if (songs[position].percentageComplete =="100")
+            text1.text = (songs[position].getNumberName()) + " - ${songs[position].title} by ${songs[position].artist}"
+        else
+            text1.text = (songs[position].getNumberName())
+
         text2.text = "${songs[position].percentageComplete}%" + " Complete" // Use a function to find % complete
 
         if(isEnabled(position)) {
@@ -64,4 +68,11 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
     override fun areAllItemsEnabled(): Boolean {
         return false
     }
+
+    public fun update(){
+        notifyDataSetChanged()
+    }
+
+
+
 }

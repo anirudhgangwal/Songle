@@ -34,7 +34,7 @@ class Lyrics (val ctx:Context,val song_number: Int) {
 
             file.close()
 
-            return line.split(" ")[column-1] + " " + location
+            return line.split(" ")[column-1]
 
 
 
