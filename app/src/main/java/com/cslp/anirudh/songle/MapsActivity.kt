@@ -338,6 +338,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         val sharedPref3 = getSharedPreferences("distance",Context.MODE_PRIVATE)
         val editor3 = sharedPref3.edit()
         editor3.putFloat(song_number.toString(),if (distance!=null) {distance!!} else {0.0f})
+        Log.d(tag,"saving distance: $song_number -- $distance")
         editor3.commit()
     }
 
