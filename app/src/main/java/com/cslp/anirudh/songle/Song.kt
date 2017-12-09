@@ -18,7 +18,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var percentageComplete = "0"
     var unlocked = false
     var guessed = false // Must implement details
-    var distance = 1.5
+    var distance:Float = 0f
     var mapLevel = 1
     var words: MutableList<String> = mutableListOf()
     var mapWordCount = HashMap<Int,Int>()
@@ -44,13 +44,18 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         updateMapLevel()
         updateWords()
 
-
+        updateDistance()
 
 
         initialMapsAndLyricsDownload()  // only if not already downloaded om the first run.
         //initialWordCount()  // only if not calculated in the first run.
     }
 
+    private fun updateDistance() {
+        val sharedPref = ctx.getSharedPreferences("distance",Context.MODE_PRIVATE)
+        distance = sharedPref.getFloat(number.toInt().toString(),0f)
+        Log.d(tag,"Song: $number mapLevel = $mapLevel")
+    }
 
 
     private fun updateMapLevel(){

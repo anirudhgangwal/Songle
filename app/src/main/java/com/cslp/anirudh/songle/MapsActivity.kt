@@ -54,7 +54,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     var mLastLocation: Location? = null
     var song_number:Int? = null
     var mapLayer: KmlLayer? = null
-
+    var oldLocation: Location? = null
+    var distance:Float? = null
     var markerList = HashMap<Marker,String>()
 
 
@@ -109,7 +110,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             for ((m,w) in markerList) {
                 Location.distanceBetween(current.latitude,current.longitude,
                         m.position.latitude,m.position.longitude,results)
-                if (results[0] <= 10f) {
+                if (results[0] <= current.accuracy || results[0] <= 5) {
                     m.remove()
                     val lyr = Lyrics(this,song_number!!)
                     val word = lyr.getWord(w)
@@ -124,7 +125,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
             updateLevel()
 
+            addDistance(current)
         }
+    }
+
+    private fun addDistance(current: Location?) {
+        distance = MainActivity.songList[song_number!!-1].distance
+        if (oldLocation != null){
+            /**val results = FloatArray(10)
+            Location.distanceBetween(current!!.latitude,current!!.longitude,
+                    oldLocation!!.latitude,oldLocation!!.longitude,results)
+            distance = distance + results[0]
+            */
+            distance = distance!! + current!!.distanceTo(oldLocation)
+            println("distance = $distance")
+            oldLocation = Location(current)
+        } else {
+            oldLocation = Location(current)
+        }
+        MainActivity.songList[song_number!!-1].distance =+ distance!!
     }
 
     private fun makeAlert(message: String,title:String = "You have leveled up!"){
@@ -315,6 +334,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         val editor2 = sharedPref2.edit()
         editor2.putInt(song_number.toString(),MainActivity.songList[song_number!!-1].mapLevel)
         editor2.commit()
+
+        val sharedPref3 = getSharedPreferences("distance",Context.MODE_PRIVATE)
+        val editor3 = sharedPref3.edit()
+        editor3.putFloat(song_number.toString(),if (distance!=null) {distance!!} else {0.0f})
+        editor3.commit()
     }
 
     private fun changeMyLocationButtonPosition(){
@@ -332,6 +356,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     }
 
     fun showGuessActivity(view: View){
+
         val intent = Intent(this,GuessActivity::class.java)
         intent.putExtra("songNumber",song_number)
         startActivity(intent)

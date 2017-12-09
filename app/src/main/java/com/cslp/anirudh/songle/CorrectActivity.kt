@@ -27,7 +27,7 @@ class CorrectActivity : AppCompatActivity() {
         videoId = getVideoId(song.link)
         textView11.text = song.title
         textView12.text = "By ${song.artist}"
-        textView13.text = "Distance covered: ${song.distance} Miles"
+        textView13.text = "Distance covered: %.0f Meters".format(song.distance)
     }
 
 
