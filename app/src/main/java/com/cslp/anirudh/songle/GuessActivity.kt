@@ -7,16 +7,19 @@ import android.os.Bundle
 import android.view.View
 import java.text.FieldPosition
 import android.content.Intent
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import kotlinx.android.synthetic.main.activity_guess.*
+import java.util.*
 
 
 class GuessActivity : AppCompatActivity() {
 
     var song_number:Int? = null // MainActivity.songList subtract one for correct song
     val tag = "GuessActivity"
+    var guessWords = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,7 @@ class GuessActivity : AppCompatActivity() {
             // Allow only 120 cahracters?
         }
 
+        guessWords = intent.getStringArrayListExtra("guessWords")
     }
 
     fun resetSentence(view:View){
@@ -48,7 +52,21 @@ class GuessActivity : AppCompatActivity() {
     }
 
     fun hint(view:View) {
-        TODO("Parse all words in map 5.")
+        println("GUESS WORD LIST: $guessWords")
+        val word = guessWords[Random().nextInt(guessWords.size)]
+        val lyr = Lyrics(this,song_number!!)
+        val w = lyr.getWord(word)
+        makeAlert("Here is a random word that you might find interesting: $w")
+
+    }
+
+    private fun makeAlert(message: String,title:String = "Hint Word"){
+        val alertDialog = AlertDialog.Builder(this).create()
+        alertDialog.setTitle(title)
+        alertDialog.setMessage(message)
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
+        ) { dialog, which -> dialog.dismiss() }
+        alertDialog.show()
     }
 
     override fun onStart() {

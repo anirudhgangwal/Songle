@@ -359,8 +359,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
     fun showGuessActivity(view: View){
 
+        val mapFileName = "song_"+correct(song_number!!)+"_map5"
+        val lst = ArrayList<String>()
+        val mapFile = openFileInput(mapFileName)
+        mapLayer = KmlLayer(mMap,mapFile,this)
+        val container = mapLayer!!.getContainers().iterator().next()
+        for (placemark in container.placemarks) {
+            val name: String = placemark.getProperty("name")
+            val description = placemark.getProperty("description")
+            if (description == "veryinteresting"){
+                lst.add(name)
+            }
+        }
+
         val intent = Intent(this,GuessActivity::class.java)
-        intent.putExtra("songNumber",song_number)
+        intent.putExtra("songNumber",song_number!!)
+        intent.putExtra("guessWords",lst)
         startActivity(intent)
     }
 
