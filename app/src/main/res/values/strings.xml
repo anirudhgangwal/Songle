@@ -7,7 +7,7 @@
     <string name="reset">Reset</string>
     <string name="app_description">Discover Songs Like You Have Never Before</string>
     <string name="listHeader">Select one of the following available puzzles! As you keep progressing, more puzzles will become available!</string>
-    <string name="try_again">Please try again once you are connected to the internet</string>
+    <string name="try_again">No Network Connection. Try Again?</string>
     <string name="guess">Guess!</string>
     <string name="progress">Progress: 0/0 Words</string>
     <string name="stat_button">Stats</string>
@@ -27,4 +27,6 @@
     <string name="home">Back to Home</string>
     <string name="hint">Get a hint!</string>
     <string name="sentence">Sentence:</string>
+    <string name="reset_songs">Reset Game Progress</string>
+    <string name="reset_deistance">Reset Distance Stats</string>
 </resources>

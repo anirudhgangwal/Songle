@@ -51,16 +51,24 @@ class MainActivity : AppCompatActivity() {
         }
         else {
             Log.d(tag, "Network Unavailable")
-            val snackbar = Snackbar.make(findViewById(android.R.id.content),
-                    "No internet connection.",
-                    Snackbar.LENGTH_INDEFINITE)
-            snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
-                    R.color.colorAccent))
-            snackbar.setAction(R.string.try_again, View.OnClickListener {
-                //recheck internet connection and call DownloadJson if there is internet
-            }).show()
+            makeSnackBar()
         }
 
+    }
+
+    fun makeSnackBar(){
+        val snackbar = Snackbar.make(findViewById(android.R.id.content),
+                "No internet connection.",
+                Snackbar.LENGTH_INDEFINITE)
+        snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
+                R.color.colorAccent))
+        snackbar.setAction(R.string.try_again, View.OnClickListener {
+            if (isNetworkAvailable()){
+                downloadSongList()
+            } else {
+                makeSnackBar()
+            }
+        }).show()
     }
 
     fun showListOfSongs(view: View) {
@@ -77,6 +85,11 @@ class MainActivity : AppCompatActivity() {
 
     fun showStats(view: View) {
         val intent = Intent(this,StatsActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun showSettings(view: View){
+        val intent = Intent(this,SettingsActivity::class.java)
         startActivity(intent)
     }
 
