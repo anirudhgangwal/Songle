@@ -35,11 +35,9 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
         updateGuessedStatus()
 
-        if (number.toInt() <= 5)
+        if (number.toInt() <= 3)
             unlocked = true
-        else {
-            // check shared pref.
-        }
+
 
         updateMapLevel()
         updateWords()

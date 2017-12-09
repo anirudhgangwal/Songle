@@ -24,7 +24,7 @@ class StatsActivity : AppCompatActivity() {
                 songGuessed += 1
             }
             Log.d(tag,"${song.number} - distance = ${song.distance}")
-            distance = distance + song.distance
+            distance += song.distance
         }
         val calorie = distance/1609.0 * 100 // Roughly 100 calories per 1 mile = 1609 metre
         textView7.text = "Songs guessed: $songGuessed"

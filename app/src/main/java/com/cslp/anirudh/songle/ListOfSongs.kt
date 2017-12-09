@@ -27,7 +27,21 @@ class ListOfSongs : ListActivity() {
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
 
-        fa = this
+        var numGuessed = 0
+        for (song in MainActivity.songList) {
+            if (song.guessed == true){
+                numGuessed += 1
+            }
+        }
+        for (song in MainActivity.songList) {
+            if(song.number.toInt() > 5){
+                if (numGuessed > 0){
+                    song.unlocked = true
+                    numGuessed -= 1
+                }
+            }
+        }
+
 
         listAdapter = MyAdapter(this, MainActivity.songList)
 
