@@ -20,9 +20,6 @@ import android.widget.Toast
 class ListOfSongs : ListActivity() {
     val tag = "ListOfSongs"
 
-    companion object {
-        var fa:Activity? = null
-    }
 
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
@@ -34,7 +31,7 @@ class ListOfSongs : ListActivity() {
             }
         }
         for (song in MainActivity.songList) {
-            if(song.number.toInt() > 5){
+            if(song.number.toInt() >= 4){
                 if (numGuessed > 0){
                     song.unlocked = true
                     numGuessed -= 1

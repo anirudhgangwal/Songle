@@ -3,8 +3,10 @@ package com.cslp.anirudh.songle
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
+import com.google.android.gms.maps.GoogleMap
 import com.google.maps.android.kml.KmlLayer
 import java.io.FileInputStream
+import java.io.InputStream
 import java.io.ObjectInputStream
 import java.sql.Timestamp
 
@@ -22,7 +24,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var mapLevel = 1
     var words: MutableList<String> = mutableListOf()
     var mapWordCount = HashMap<Int,Int>()
-
+    var totalWords = 0
 
 
     fun getNumberName(): String = "Puzzle " + number
@@ -33,7 +35,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     init {
 
-        updateGuessedStatus()
+
 
         if (number.toInt() <= 3)
             unlocked = true
@@ -47,6 +49,10 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
         initialMapsAndLyricsDownload()  // only if not already downloaded om the first run.
         //initialWordCount()  // only if not calculated in the first run.
+
+        updateGuessedStatus()
+        setTotalWords()
+        setPercentageComplete()
     }
 
     private fun updateDistance() {
@@ -78,7 +84,13 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         if (guessed) {
             percentageComplete = "100"
         }
-        //TODO("Calculate percentage, need map 5 words.")
+    }
+
+    fun setTotalWords(){
+        val lyr = Lyrics(ctx,number.toInt())
+
+        totalWords = lyr.getTotalWordCount()
+
     }
 
     private fun initialMapsAndLyricsDownload(){
@@ -161,6 +173,9 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     }
 
+    fun setPercentageComplete() {
+        percentageComplete = "%.2f".format(words.size.toFloat()/totalWords!!*100)
+    }
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -181,5 +196,6 @@ class MapDownloadListener(val number: Int,val description:Int) : DownloadComplet
 class WordsDownloadListener(val number:Int) : DownloadCompleteListener2 {
     override fun downloadComplete(result: List<String>) {
         MainActivity.songList[number-1].saveLyrics(result)
+
     }
 }

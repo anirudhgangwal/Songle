@@ -126,6 +126,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             updateLevel()
 
             addDistance(current)
+
+            MainActivity.songList[song_number!!-1].setPercentageComplete()
         }
     }
 
@@ -282,10 +284,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     private fun updateProgressBar(){
         val wordsCollected = MainActivity.songList[song_number!!-1].words.size
         val mapLevel = MainActivity.songList[song_number!!-1].mapLevel
-        val totalWordsinLevel = MainActivity.songList[song_number!!-1].
-                mapWordCount[MainActivity.songList[song_number!!-1].mapLevel]
+        val totalWordsinSong = MainActivity.songList[song_number!!-1].totalWords
 
-        textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinLevel} Words Lvl: ${mapLevel}"
+        textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinSong} Words Lvl: ${mapLevel}"
     }
 
     private fun correct(n:Int):String{

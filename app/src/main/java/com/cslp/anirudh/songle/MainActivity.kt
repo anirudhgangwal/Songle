@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var songList = ArrayList<Song>()
+        var isListSet = false // relaunch of activity shouldn't download songs again. (eg. by back button)
     }
 
     val tag = "MainActivity"
@@ -87,10 +88,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun downloadSongList() {
-        Log.d(tag,"Network available")
-        val listener = SongDownloadListener(this)
-        val downloader = DownloadXmlTask(listener)
-        downloader.execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+        if (MainActivity.isListSet == false) {
+            Log.d(tag, "Network available")
+            val listener = SongDownloadListener(this)
+            val downloader = DownloadXmlTask(listener)
+            downloader.execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
+            MainActivity.isListSet = true
+        }
     }
 
 
