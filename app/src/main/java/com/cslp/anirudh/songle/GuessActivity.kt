@@ -53,11 +53,14 @@ class GuessActivity : AppCompatActivity() {
 
     fun hint(view:View) {
         println("GUESS WORD LIST: $guessWords")
-        val word = guessWords[Random().nextInt(guessWords.size)]
-        val lyr = Lyrics(this,song_number!!)
-        val w = lyr.getWord(word)
-        makeAlert("Here is a random word that you might find interesting: $w")
-
+        if (guessWords.size > 0) {
+            val word = guessWords[Random().nextInt(guessWords.size)]
+            val lyr = Lyrics(this, song_number!!)
+            val w = lyr.getWord(word)
+            makeAlert("Here is a random word that you might find interesting: $w")
+        } else {
+            makeAlert("Sorry. This song has no very-interesting word.")
+        }
     }
 
     private fun makeAlert(message: String,title:String = "Hint Word"){

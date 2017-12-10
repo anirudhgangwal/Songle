@@ -11,6 +11,10 @@ import android.view.View
 import android.widget.ListAdapter
 import android.widget.ListView
 import android.widget.Toast
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemLongClickListener
+
+
 
 
 /**
@@ -48,7 +52,10 @@ class ListOfSongs : ListActivity() {
         header.elevation=8.0f
         lv.addHeaderView(header, null, false)
 
+
     }
+
+
 
 
 
@@ -63,6 +70,8 @@ class ListOfSongs : ListActivity() {
 
 
     }
+
+
 
 
 
