@@ -35,7 +35,8 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     init {
 
-
+        initialMapsAndLyricsDownload()  // only if not already downloaded om the first run.
+        //initialWordCount()  // only if not calculated in the first run.
 
         if (number.toInt() <= 3)
             unlocked = true
@@ -47,12 +48,10 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         updateDistance()
 
 
-        initialMapsAndLyricsDownload()  // only if not already downloaded om the first run.
-        //initialWordCount()  // only if not calculated in the first run.
+
 
         updateGuessedStatus()
-        setTotalWords()
-        setPercentageComplete()
+
     }
 
     private fun updateDistance() {
@@ -197,5 +196,9 @@ class WordsDownloadListener(val number:Int) : DownloadCompleteListener2 {
     override fun downloadComplete(result: List<String>) {
         MainActivity.songList[number-1].saveLyrics(result)
 
+        // These require lyrics to have been downloaded.
+        // Calling them before (on the very first run) has issues
+        MainActivity.songList[number-1].setTotalWords()
+        MainActivity.songList[number-1].setPercentageComplete()
     }
 }

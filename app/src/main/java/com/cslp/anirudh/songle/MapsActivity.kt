@@ -285,8 +285,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         val wordsCollected = MainActivity.songList[song_number!!-1].words.size
         val mapLevel = MainActivity.songList[song_number!!-1].mapLevel
         val totalWordsinSong = MainActivity.songList[song_number!!-1].totalWords
-
         textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinSong} Words Lvl: ${mapLevel}"
+
     }
 
     private fun correct(n:Int):String{

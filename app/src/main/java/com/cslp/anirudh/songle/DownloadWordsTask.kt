@@ -7,6 +7,9 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URL
+import android.app.ProgressDialog
+
+
 
 /**
  * Created by anirudh on 08/12/17.
@@ -43,7 +46,9 @@ class DownloadWordsTask(private val caller: DownloadCompleteListener2) :
             Log.d(tag,"Post execution - calling download complete on caller")
             caller.downloadComplete(result)
         }
+
     }
+
 }
 
 interface DownloadCompleteListener2 {
