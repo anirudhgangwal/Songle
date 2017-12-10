@@ -45,6 +45,8 @@ class SettingsActivity : AppCompatActivity() {
         val editor = sharedPref.edit()
         editor.clear()
         editor.commit()
+
+        Toast.makeText(this,"Distance stats have been reset", Toast.LENGTH_SHORT) // Feedback
     }
 
     fun resetAllProgress(){
@@ -72,5 +74,7 @@ class SettingsActivity : AppCompatActivity() {
         val editor3 = sharedPref3.edit()
         editor3.clear()
         editor3.commit()
+
+        Toast.makeText(this,"Progress has been reset",Toast.LENGTH_SHORT) // Feedback
     }
 }

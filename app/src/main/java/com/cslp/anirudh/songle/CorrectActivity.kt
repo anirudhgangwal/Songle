@@ -9,6 +9,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_correct.*
 
 
@@ -58,12 +59,15 @@ class CorrectActivity : AppCompatActivity() {
     }
 
     fun backToHome(view: View){
+        Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT) // Feedback
         val intent = Intent(this,MainActivity::class.java)
         startActivity(intent)
+
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
+        Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT) // Feedback
         val intent = Intent(this,MainActivity::class.java)
         startActivity(intent)
         finish()
