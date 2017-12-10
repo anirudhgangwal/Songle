@@ -44,12 +44,16 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
         val text1 = twoLineListItem.text1
         val text2 = twoLineListItem.text2
 
-        if (songs[position].percentageComplete =="100")
+        if (songs[position].guessed == true){
             text1.text = (songs[position].getNumberName()) + " - ${songs[position].title} by ${songs[position].artist}"
-        else
+            text2.text = "100%" + " Complete"
+        } else {
             text1.text = (songs[position].getNumberName())
+            text2.text = "${songs[position].percentageComplete}%" + " Complete"
+        }
 
-        text2.text = "${songs[position].percentageComplete}%" + " Complete" // Use a function to find % complete
+
+        // Use a function to find % complete
 
         if(isEnabled(position)) {
             twoLineListItem.setBackgroundColor(parent.getResources().getColor(R.color.active_list_item));

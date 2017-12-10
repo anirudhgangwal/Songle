@@ -54,6 +54,9 @@ class SettingsActivity : AppCompatActivity() {
             song.guessed = false
             song.mapLevel = 1
             song.words.clear()
+            song.setPercentageComplete()
+            if (song.number.toInt() > 3)
+                song.unlocked = false
         }
         val sharedPref = getSharedPreferences("guessedSongs", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()

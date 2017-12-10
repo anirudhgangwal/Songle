@@ -52,6 +52,14 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
         updateGuessedStatus()
 
+        if ("${number}Lyrics" in ctx.fileList()){
+            // if  lyrics not downloaded yet (first run), they will be downloaded.
+            // Downloader sets totalWords automatically.
+            val lyr = Lyrics(ctx,number.toInt())
+            totalWords = lyr.getTotalWordCount()
+            setPercentageComplete()
+        }
+
     }
 
     private fun updateDistance() {
@@ -87,8 +95,8 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     fun setTotalWords(){
         val lyr = Lyrics(ctx,number.toInt())
-
         totalWords = lyr.getTotalWordCount()
+
 
     }
 
