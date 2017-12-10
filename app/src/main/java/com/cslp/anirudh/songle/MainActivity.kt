@@ -1,31 +1,18 @@
 package com.cslp.anirudh.songle
 
+import android.Manifest
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.util.Xml
 import android.view.View
-import android.webkit.DownloadListener
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserException
-import android.R.attr.name
 import android.content.Context
-import java.nio.charset.StandardCharsets
-import android.net.NetworkInfo
-import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
 import android.support.v4.content.ContextCompat
 import android.support.design.widget.Snackbar
 import android.widget.Toast
-import java.io.*
-import java.sql.Timestamp
-import android.content.SharedPreferences
-import android.R.id.edit
-
-
-
-
+import android.content.pm.PackageManager
+import android.support.v4.app.ActivityCompat
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,6 +42,12 @@ class MainActivity : AppCompatActivity() {
             makeSnackBar()
         }
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+
+        }
     }
 
     fun makeSnackBar(){

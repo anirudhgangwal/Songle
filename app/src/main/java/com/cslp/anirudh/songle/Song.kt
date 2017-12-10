@@ -17,7 +17,7 @@ import java.sql.Timestamp
 class Song(val ctx: Context, val number: String, val artist: String, val title: String, val link: String) {
     val tag = "Song"
 
-    var percentageComplete = "0"
+    var percentageComplete = "0.00"
     var unlocked = false
     var guessed = false // Must implement details
     var distance:Float = 0f

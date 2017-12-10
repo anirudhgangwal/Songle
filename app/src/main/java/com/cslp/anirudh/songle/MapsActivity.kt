@@ -74,11 +74,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             if (mLastLocation == null){
                 println("$tag Warning LastLocation is null")
             }
+            try {
+                mMap.isMyLocationEnabled = true
+            }catch (se: SecurityException) {
+                println("security exception thrown on [onMapReady]")
+            }
+
         }
         else {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     permissionsRequestAccessFineLocation)
+
         }
     }
 
@@ -223,12 +230,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
         openCorrectMap()    // Load correct map appropriately.
 
-
         try {
             mMap.isMyLocationEnabled = true
         }catch (se: SecurityException) {
             println("security exception thrown on [onMapReady]")
         }
+
+
+
+
 
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
@@ -310,6 +320,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
                     mLocationRequest,this)
+
         }
     }
 
