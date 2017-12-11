@@ -18,7 +18,7 @@ import android.support.v4.app.ActivityCompat
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        var songList = ArrayList<Song>()
+        var songList = ArrayList<Song>() // Store all songs here
         var isListSet = false // relaunch of activity shouldn't download songs again. (eg. by back button)
     }
 
@@ -35,11 +35,11 @@ class MainActivity : AppCompatActivity() {
 
         if (isNetworkAvailable()){
             Log.d(tag,"Network Available")
-            downloadSongList()
+            downloadSongList() // always download song list and set things in motion.
         }
         else {
             Log.d(tag, "Network Unavailable")
-            makeSnackBar()
+            makeSnackBar() // Will keep making snack bar until songs.xml is downloaded
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -51,44 +51,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun makeSnackBar(){
+
         val snackbar = Snackbar.make(findViewById(android.R.id.content),
                 "No internet connection.",
                 Snackbar.LENGTH_INDEFINITE)
         snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
                 R.color.colorAccent))
         snackbar.setAction(R.string.try_again, View.OnClickListener {
-            if (isNetworkAvailable()){
+            if (isNetworkAvailable()){  // User may click bar to retry song.xml download
                 downloadSongList()
             } else {
-                makeSnackBar()
+                makeSnackBar()  // if download still fails, bar is made again.
             }
         }).show()
     }
 
     fun showListOfSongs(view: View) {
+        // Starts Puzzle list activity
         if (!songList.isEmpty()){
             val intent = Intent(this,ListOfSongs::class.java)
             startActivity(intent)
         }
-        else {
+        else { // let user know files have not been downloaded
             Toast.makeText(this, "Failed to download latest songs", Toast.LENGTH_SHORT).show();
             Toast.makeText(this, "Ensure active internet connection", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    fun showStats(view: View) {
+    fun showStats(view: View) { // start stats activity
         val intent = Intent(this,StatsActivity::class.java)
         startActivity(intent)
     }
 
-    fun showSettings(view: View){
+    fun showSettings(view: View){ // start settings activity
         val intent = Intent(this,SettingsActivity::class.java)
         startActivity(intent)
     }
 
     private fun isNetworkAvailable(): Boolean {
-
+        // Network available?
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
@@ -104,12 +106,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-    override fun onStop() {
-        super.onStop()
-
+    override fun onBackPressed() { // Back button from home should exit the app
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
     }
+
 
 
 }

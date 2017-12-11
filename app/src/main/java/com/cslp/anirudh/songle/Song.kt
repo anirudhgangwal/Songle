@@ -13,69 +13,80 @@ import java.sql.Timestamp
 /**
  * Created by anirudh on 06/11/17.
  * Song
+ *
+ * Represents a song.
+ *
+ * No need to check time stamp - if files exist, they are simply not redownloaded again.
+ *
+ * Self contained with all information about itself.
  */
 class Song(val ctx: Context, val number: String, val artist: String, val title: String, val link: String) {
     val tag = "Song"
 
-    var percentageComplete = "0.00"
-    var unlocked = false
-    var guessed = false // Must implement details
+    // These will be set in init {..} below.
+    var percentageComplete = "0.00" // words collected by total words in this song.
+    var unlocked = false    // is this song playable yet?
+    var guessed = false
     var distance:Float = 0f
     var mapLevel = 1
-    var words: MutableList<String> = mutableListOf()
-    var mapWordCount = HashMap<Int,Int>()
+    var words: MutableList<String> = mutableListOf() // words collected by user
+    var mapWordCount = HashMap<Int,Int>() // set in MapsActivity as maps are used.
     var totalWords = 0
 
 
-    fun getNumberName(): String = "Puzzle " + number
+    fun getNumberName(): String = "Puzzle " + number // Used when displaying puzzles
 
     override fun toString(): String {
         return("Numer: $number  Artist: $artist Title: $title   Link: $link")
     }
 
     init {
+        // Initialise everything here. Files downloaded only in the first run. On subsequent runs,
+        // they are taken from internal storage.
+        //
+        // 1. All 5 maps are loaded.
+        // 2. first three puzzles are set unlocked (playable) default. Other songs become unlocked in ListOfSongs AActivity
+        // 3. Map Level is updated
+        // 4. Collected words are restored
+        // 5. Distance traveled for solving particular song is read
+        // 6. Check if song has been guessed before and do needful
+        // 7. Set total words
 
-        initialMapsAndLyricsDownload()  // only if not already downloaded om the first run.
-        //initialWordCount()  // only if not calculated in the first run.
+        initialMapsAndLyricsDownload()  // only if not already downloaded on the first run.
 
         if (number.toInt() <= 3)
             unlocked = true
 
-
         updateMapLevel()
         updateWords()
-
         updateDistance()
-
-
-
-
         updateGuessedStatus()
 
         if ("${number}Lyrics" in ctx.fileList()){
-            // if  lyrics not downloaded yet (first run), they will be downloaded.
-            // Downloader sets totalWords automatically.
+            // Set total words and percentage complete if lyrics in internal storage.
+            // Only case when lyrics not in internal storage is when the app is first run, in that -
+            // - case, this is done after async task is complete by Download Listener
             val lyr = Lyrics(ctx,number.toInt())
-            totalWords = lyr.getTotalWordCount()
+            totalWords = lyr.getTotalWordCount()  // get total words from lyrics
             setPercentageComplete()
         }
 
     }
 
-    private fun updateDistance() {
+    private fun updateDistance() {  // Get distance from shared preference
         val sharedPref = ctx.getSharedPreferences("distance",Context.MODE_PRIVATE)
         distance = sharedPref.getFloat(number.toInt().toString(),0f)
         Log.d(tag,"Song: $number mapLevel = $mapLevel")
     }
 
 
-    private fun updateMapLevel(){
+    private fun updateMapLevel(){ // Get Old Map level from shared preference
         val sharedPref = ctx.getSharedPreferences("mapLevel",Context.MODE_PRIVATE)
         mapLevel = sharedPref.getInt(number.toInt().toString(),1)
         Log.d(tag,"Song: $number mapLevel = $mapLevel")
     }
 
-    private fun updateWords(){
+    private fun updateWords(){ // get words collected from shared preference
         val sharedPref = ctx.getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
         val set = sharedPref.getStringSet(number.toInt().toString(),null)
         if (set != null){
@@ -83,24 +94,24 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         }
     }
 
-    private fun updateGuessedStatus(){
+    private fun updateGuessedStatus(){ // set guessed status from shared preference
         val sharedPref2 = ctx.getSharedPreferences("guessedSongs",Context.MODE_PRIVATE)
         val isGuessed = sharedPref2.getBoolean(number.toInt().toString(),false)
         guessed = isGuessed
 
-        if (guessed) {
+        if (guessed) { // if song is guessed, percentage complete = 100%
             percentageComplete = "100"
         }
     }
 
-    fun setTotalWords(){
+    fun setTotalWords(){  // return total words in song
         val lyr = Lyrics(ctx,number.toInt())
         totalWords = lyr.getTotalWordCount()
 
 
     }
 
-    private fun initialMapsAndLyricsDownload(){
+    private fun initialMapsAndLyricsDownload(){ // download everything if not already downloaded.
         val urlMap1 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map1.kml"
         val urlMap2 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map2.kml"
         val urlMap3 = "http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/${number}/map3.kml"
@@ -149,26 +160,22 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         }
     }
 
-    fun saveLyrics(result: List<String>){
+    fun saveLyrics(result: List<String>){ // Save lyrics (words.txt)
         val FILENAME = "${number}Lyrics"
 
         Log.d(tag, "Writing file with name: $FILENAME")
 
-
         val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
         var lines = ""
         for (line in result){
-            //println(line)
             lines = lines + line + "\n"
         }
-        //println("lines:\n"+lines)
         fos.write(lines.toByteArray())
-        //fos.write(string.toByteArray())
         fos.close()
 
     }
 
-    fun setMap(kmlString: String, mapNum:Int){
+    fun setMap(kmlString: String, mapNum:Int){ // save maps
         val FILENAME = "song_"+number+"_map$mapNum"
 
         Log.d(tag, "Writing file with name: $FILENAME")
@@ -180,11 +187,11 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     }
 
-    fun setPercentageComplete() {
+    fun setPercentageComplete() { // percentage complete
         percentageComplete = "%.2f".format(words.size.toFloat()/totalWords!!*100)
     }
 
-    private fun isNetworkAvailable(): Boolean {
+    private fun isNetworkAvailable(): Boolean { // network available?
         val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
@@ -193,13 +200,14 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
 }
 
-class MapDownloadListener(val number: Int,val description:Int) : DownloadCompleteListener {
+// Save maps once downloaded
+class MapDownloadListener(val number: Int,val description:Int) : DownloadCompleteListener{
     override fun downloadComplete(result: String) {
         MainActivity.songList[number-1].setMap(result,description)
     }
 }
 
-
+// Save lyrics
 class WordsDownloadListener(val number:Int) : DownloadCompleteListener2 {
     override fun downloadComplete(result: List<String>) {
         MainActivity.songList[number-1].saveLyrics(result)
