@@ -29,7 +29,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     var guessed = false
     var distance:Float = 0f
     var mapLevel = 1
-    var words: MutableList<String> = mutableListOf() // words collected by user
+    var words: Set<String> = setOf() // words collected by user
     var mapWordCount = HashMap<Int,Int>() // set in MapsActivity as maps are used.
     var totalWords = 0
 
@@ -90,7 +90,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         val sharedPref = ctx.getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
         val set = sharedPref.getStringSet(number.toInt().toString(),null)
         if (set != null){
-            words.addAll(set)
+            words = words + set
         }
     }
 

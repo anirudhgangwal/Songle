@@ -122,16 +122,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                     m.remove()
                     val lyr = Lyrics(this,song_number!!)
                     val word = lyr.getWord(w)
-                    song!!.words.add(w)
+                    song!!.words += w
                     Toast.makeText(this, "Word Added: ${word}", Toast.LENGTH_SHORT).show()
                     removeMarker = m    // No need to check distance with this marker again.
                 }
             }
             markerList.remove(removeMarker) // removing this marker from list
 
-            updateProgressBar() // progress bar need to update
-
             updateLevel() // need to update level?
+
+            updateProgressBar() // progress bar need to update
 
             addDistance(current) // add distance
 
@@ -181,8 +181,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                     4 -> makeAlert("This is the last lot of words from lyrics!")
                     else -> makeAlert("ERROR: PLEASE REPORT.")
                 }
-                updateProgressBar() // show level has changed on progress bar
+                mMap.clear()
                 openCorrectMap()  // open next level of map
+                updateProgressBar() // show level has changed on progress bar
             }
         } else {
             // All words collected

@@ -55,7 +55,7 @@ class SettingsActivity : AppCompatActivity() {
         for (song in MainActivity.songList){
             song.guessed = false
             song.mapLevel = 1
-            song.words.clear()
+            song.words = setOf()
             song.setPercentageComplete()
             if (song.number.toInt() > 3)
                 song.unlocked = false
