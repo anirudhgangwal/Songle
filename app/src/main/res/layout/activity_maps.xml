@@ -30,6 +30,7 @@
         android:text="@string/progress"
         android:padding="10dp"
         android:layout_marginTop="20dp"
+        android:onClick="centreAtGeorgeSquare"
         android:paddingLeft="10dp"
         android:textColor="@color/white"
         android:background="@color/colorPrimary"

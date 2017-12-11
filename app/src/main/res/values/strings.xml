@@ -29,4 +29,5 @@
     <string name="sentence">Sentence:</string>
     <string name="reset_songs">Reset Game Progress</string>
     <string name="reset_deistance">Reset Distance Stats</string>
+    <string name="give_up">Give up?</string>
 </resources>

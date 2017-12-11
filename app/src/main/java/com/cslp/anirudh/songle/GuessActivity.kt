@@ -44,6 +44,11 @@ class GuessActivity : AppCompatActivity() {
             // Allow only 120 cahracters?
         }
 
+        if (MainActivity.songList[song_number!!-1].mapLevel == 4){
+            // User may give up if he has reached map4
+            giveup.visibility = View.VISIBLE
+        }
+
         guessWords = intent.getStringArrayListExtra("guessWords")
     }
 
@@ -53,6 +58,7 @@ class GuessActivity : AppCompatActivity() {
 
     fun hint(view:View) {
         println("GUESS WORD LIST: $guessWords")
+
         if (guessWords.size > 0) {
             val word = guessWords[Random().nextInt(guessWords.size)]
             val lyr = Lyrics(this, song_number!!)
@@ -74,6 +80,10 @@ class GuessActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+    }
+
+    fun giveUp(view:View){
+        editText.setText(MainActivity.songList[song_number!!-1].title)
     }
 
 

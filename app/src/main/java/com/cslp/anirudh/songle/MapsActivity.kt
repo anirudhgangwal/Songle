@@ -399,5 +399,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         startActivity(intent)
     }
 
-
+    fun centreAtGeorgeSquare(view:View){
+        val centralArea = LatLng(55.944335, -3.1889770)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centralArea, 16F))
+    }
 }
