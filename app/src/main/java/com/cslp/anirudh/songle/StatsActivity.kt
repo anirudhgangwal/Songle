@@ -28,7 +28,7 @@ class StatsActivity : AppCompatActivity() {
         }
         val calorie = distance/1609.0 * 100 // Roughly 100 calories per 1 mile = 1609 metre
         textView7.text = "Songs guessed: $songGuessed"
-        textView6.text = "Distance Travelled: %.0f".format(distance)
+        textView6.text = "Distance Travelled: %.0f m".format(distance)
         textView8.text = "Tentative Calories burnt: %.2f".format(calorie)
     }
 }

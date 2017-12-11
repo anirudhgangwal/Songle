@@ -56,7 +56,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     var mapLayer: KmlLayer? = null
     var oldLocation: Location? = null
     var distance:Float? = null
+    // map of markers that are currently shown on map to their name "row:column"
     var markerList = HashMap<Marker,String>()
+    var song: Song? = null
+
 
 
     override fun onConnected(p0: Bundle?) {
@@ -109,9 +112,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 (${current.latitude},
                 ${current.longitude})"""
             )
-            // Do something with current location
-            // Particularly, maybe check if near any placemark, if so, call addWord()
-            // addWord() - should use the point in palcemark to search for detials and add word.
+            //
             val results = FloatArray(10)
             var removeMarker: Marker? = null
             for ((m,w) in markerList) {
@@ -121,7 +122,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                     m.remove()
                     val lyr = Lyrics(this,song_number!!)
                     val word = lyr.getWord(w)
-                    MainActivity.songList[song_number!!-1].words.add(w)
+                    song!!.words.add(w)
                     Toast.makeText(this, "Word Added: ${word}", Toast.LENGTH_SHORT).show()
                     removeMarker = m    // No need to check distance with this marker again.
                 }
@@ -130,32 +131,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
 
             updateProgressBar() // progress bar need to update
 
-            updateLevel()
+            updateLevel() // need to update level?
 
-            addDistance(current)
+            addDistance(current) // add distance
 
-            MainActivity.songList[song_number!!-1].setPercentageComplete()
+            song!!.setPercentageComplete() // change percentage complete
         }
     }
 
     private fun addDistance(current: Location?) {
-        distance = MainActivity.songList[song_number!!-1].distance
+        // Add distance travelled
+
+        distance = song!!.distance // Get distance
+
         if (oldLocation != null){
-            /**val results = FloatArray(10)
-            Location.distanceBetween(current!!.latitude,current!!.longitude,
-                    oldLocation!!.latitude,oldLocation!!.longitude,results)
-            distance = distance + results[0]
-            */
             distance = distance!! + current!!.distanceTo(oldLocation)
             println("distance = $distance")
             oldLocation = Location(current)
         } else {
             oldLocation = Location(current)
         }
-        MainActivity.songList[song_number!!-1].distance =+ distance!!
+
+        song!!.distance =+ distance!! // update distance
     }
 
-    private fun makeAlert(message: String,title:String = "You have leveled up!"){
+    private fun makeAlert(message: String, title:String = "You have leveled up!"){
+        // Makes a simple alert
         val alertDialog = AlertDialog.Builder(this).create()
         alertDialog.setTitle(title)
         alertDialog.setMessage(message)
@@ -165,15 +166,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     }
 
     private fun updateLevel() {
-        val wordsCollected = MainActivity.songList[song_number!!-1].words.size
-        val mapLevel = MainActivity.songList[song_number!!-1].mapLevel
-        val totalWordsinLevel = MainActivity.songList[song_number!!-1].
-                mapWordCount[MainActivity.songList[song_number!!-1].mapLevel]
+        // Updates map level if all words in present level are collected
 
-        if (mapLevel < 4){
+        val wordsCollected = song!!.words.size
+        val mapLevel = song!!.mapLevel
+        val totalWordsinLevel = song!!.mapWordCount[song!!.mapLevel]
+
+        if (mapLevel < 4){ // Total 4 levels
             if (wordsCollected == totalWordsinLevel){
-                MainActivity.songList[song_number!!-1].mapLevel += 1
-                when (MainActivity.songList[song_number!!-1].mapLevel) {
+                song!!.mapLevel += 1
+                when (song!!.mapLevel) { // User feedback
                     2 -> makeAlert("You can now prioritise between \"boring\" and \"notboring\" words!")
                     3 -> makeAlert("You are now shown interesting words!")
                     4 -> makeAlert("This is the last lot of words from lyrics!")
@@ -183,6 +185,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 openCorrectMap()  // open next level of map
             }
         } else {
+            // All words collected
             if (wordsCollected == totalWordsinLevel){
                 makeAlert("You have collected all the lyrics of this song! Try and guess now!","All Words Collected")
             }
@@ -206,14 +209,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 .addApi(LocationServices.API)
                 .build()
 
+        // Get song number to set everything according to it
         song_number = intent.getIntExtra("ListClick",0)
+        song = MainActivity.songList[song_number!!-1]
+
     }
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -221,14 +226,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val central_area = LatLng(55.944335, -3.1889770)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(central_area, 16F))
+        // Move to University Central Area
+        val centralArea = LatLng(55.944335, -3.1889770)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centralArea, 16F))
 
-
-        //textViewProgress.text = "Song ${song_number}: 0/0 Words "
-
-        openCorrectMap()    // Load correct map appropriately.
+        openCorrectMap()    // Load correct map based on map level and words collected
 
         try {
             mMap.isMyLocationEnabled = true
@@ -236,13 +238,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             println("security exception thrown on [onMapReady]")
         }
 
-
-
-
-
         mMap.uiSettings.isMyLocationButtonEnabled = true
 
-        changeMyLocationButtonPosition()     // Shift the button to the bottom
+        changeMyLocationButtonPosition()   // Shift MyLocation button to the bottom
 
     }
 
@@ -253,17 +251,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         Log.d(tag,"Attempting to open file with name: $mapFileName")
         val mapFile = openFileInput(mapFileName)
         mapLayer = KmlLayer(mMap,mapFile,this)
+
         // Here - Only show words which are not in caught words.
+        var counter = 0 // count number of words in this map level
+        val container = mapLayer!!.getContainers().iterator().next(); // get placemark container
 
-
-        //First container in the kmlLayer
-        var counter = 0
-        val container = mapLayer!!.getContainers().iterator().next();
-        for (placemark in container.placemarks){
-            counter = counter + 1
+        for (placemark in container.placemarks) {
+            counter = counter + 1  // words found
+            // Get attributes
             val point = placemark.geometry as KmlPoint
             val name:String = placemark.getProperty("name")
-            if (name !in MainActivity.songList[song_number!!-1].words) {
+            // check if word not collected
+            if (name !in song!!.words) {
+                // Place on map according to description
+
                 val title = placemark.getProperty("description")
                 var style: String
                 val styleUrl = placemark.styleId
@@ -279,27 +280,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 else
                     style = "redstars"
 
+                // get icon from resources based on style
                 val drawableId = resources.getIdentifier(style, "drawable", packageName)
 
+                // Place the marker on map
                 val m = mMap.addMarker(MarkerOptions().position(point.geometryObject)
                         .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
                 markerList[m] = name
             }
         }
-        MainActivity.songList[song_number!!-1].
-                mapWordCount[MainActivity.songList[song_number!!-1].mapLevel] = counter
+        // mapWordCount[MapLevel] = num_of_words_in_map
+        song!!.mapWordCount[song!!.mapLevel] = counter
         updateProgressBar()
     }
 
     private fun updateProgressBar(){
-        val wordsCollected = MainActivity.songList[song_number!!-1].words.size
-        val mapLevel = MainActivity.songList[song_number!!-1].mapLevel
-        val totalWordsinSong = MainActivity.songList[song_number!!-1].totalWords
+        // Should be called with every change (in onLocationChanged)
+
+        val wordsCollected = song!!.words.size
+        val mapLevel = song!!.mapLevel
+        val totalWordsinSong = song!!.totalWords
+
         textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinSong} Words Lvl: ${mapLevel}"
 
     }
 
-    private fun correct(n:Int):String{
+    private fun correct(n:Int): String {
+        // Correct naming
         if (n<10)
             return "0"+n
         else
@@ -334,19 +341,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         if (mGoogleApiClient.isConnected)
             mGoogleApiClient.disconnect()
 
-        // Collected words
+        // Store Collected words
         val sharedPref = getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
-        val set = MainActivity.songList[song_number!!-1].words.toSet()
+        val set = song!!.words.toSet()
         editor.putStringSet(song_number.toString(), set);
         editor.commit()
 
-        // Map Level
+        // Store map Level
         val sharedPref2 = getSharedPreferences("mapLevel",Context.MODE_PRIVATE)
         val editor2 = sharedPref2.edit()
-        editor2.putInt(song_number.toString(),MainActivity.songList[song_number!!-1].mapLevel)
+        editor2.putInt(song_number.toString(),song!!.mapLevel)
         editor2.commit()
 
+        // store distance
         val sharedPref3 = getSharedPreferences("distance",Context.MODE_PRIVATE)
         val editor3 = sharedPref3.edit()
         editor3.putFloat(song_number.toString(),if (distance!=null) {distance!!} else {0.0f})
@@ -354,7 +362,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         editor3.commit()
     }
 
-    private fun changeMyLocationButtonPosition(){
+    private fun changeMyLocationButtonPosition(){ // My location button is moved to right bottom
         if (mapView != null && mapView!!.findViewById<View>(Integer.parseInt("1")) != null) {
             // Get the button view
             val locationButton = (mapView!!.findViewById<View>(Integer.parseInt("1")).getParent()
@@ -368,8 +376,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         }
     }
 
-    fun showGuessActivity(view: View){
+    fun showGuessActivity(view: View){  // Shows guess activity
 
+        // Get map5's very-interesting words if any and send as hints to guess activity
         val mapFileName = "song_"+correct(song_number!!)+"_map5"
         val lst = ArrayList<String>()
         val mapFile = openFileInput(mapFileName)
@@ -382,7 +391,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 lst.add(name)
             }
         }
-
+        // Launch guess activity with
         val intent = Intent(this,GuessActivity::class.java)
         intent.putExtra("songNumber",song_number!!)
         intent.putExtra("guessWords",lst)
