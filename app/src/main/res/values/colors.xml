@@ -6,4 +6,7 @@
     <color name="active_list_item">#ffe9c9</color>
     <color name="inactive_list_item">#ffffff</color>
     <color name="white">#ffffff</color>
+    <color name="intro1">#ebc944</color>
+    <color name="intro3">#f26d21</color>
+    <color name="intro2">#c02f1d</color>
 </resources>

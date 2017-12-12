@@ -13,6 +13,10 @@ import android.support.design.widget.Snackbar
 import android.widget.Toast
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
+import android.R.id.edit
+import android.content.SharedPreferences
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +31,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val sp = getSharedPreferences("Intro", Context.MODE_PRIVATE)
+        if (!sp.getBoolean("first", false)) {
+            val editor = sp.edit()
+            editor.putBoolean("first", true)
+            editor.apply()
+            val intent = Intent(this, IntroActivity::class.java) // Call the AppIntro java class
+            startActivity(intent)
+        }
     }
 
 
@@ -42,12 +54,6 @@ class MainActivity : AppCompatActivity() {
             makeSnackBar() // Will keep making snack bar until songs.xml is downloaded
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-
-        }
     }
 
     fun makeSnackBar(){
