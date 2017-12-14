@@ -19,15 +19,13 @@ import java.time.format.DateTimeFormatter
 class SongDownloadListener(private val context: Context) : DownloadCompleteListener{
     override fun downloadComplete(result: String) {
         Log.i("SongDownloadListener",result)
-        assert(result!=null)
         MainActivity.songList =  parseXml(result)
 
     }
 
 
     fun parseXml(s: String):ArrayList<Song> {
-        var songs = ArrayList<Song>()
-        songs = parse(s)
+        var songs = parse(s)
 
         return songs
     }
@@ -37,7 +35,7 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
 
     @Throws(XmlPullParserException::class, IOException::class)
     fun parse(input : String): ArrayList<Song> {
-        var songs = ArrayList<Song>()
+
         val stream: InputStream = input.byteInputStream()
 
         val parser = Xml.newPullParser()

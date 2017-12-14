@@ -104,216 +104,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         println(" >>>> onConnectionFailed")
     }
 
-    override fun onLocationChanged(current: Location?) {
-        if (current == null) {
-            println("[$tag] [onLocationChanged] Location unknown")
-        } else {
-            println("""[$tag] [onLocationChanged] Lat/long now
-                (${current.latitude},
-                ${current.longitude})"""
-            )
-            //
-            val results = FloatArray(10)
-            var removeMarker: Marker? = null
-            for ((m,w) in markerList) {
-                Location.distanceBetween(current.latitude,current.longitude,
-                        m.position.latitude,m.position.longitude,results)
-                if (results[0] <= current.accuracy || results[0] <= 5) {
-                    m.remove()
-                    val lyr = Lyrics(this,song_number!!)
-                    val word = lyr.getWord(w)
-                    song!!.words += w
-                    Toast.makeText(this, "Word Added: ${word}", Toast.LENGTH_SHORT).show()
-                    removeMarker = m    // No need to check distance with this marker again.
-                }
-            }
-            markerList.remove(removeMarker) // removing this marker from list
-
-            updateLevel() // need to update level?
-
-            updateProgressBar() // progress bar need to update
-
-            addDistance(current) // add distance
-
-            song!!.setPercentageComplete() // change percentage complete
-        }
-    }
-
-    private fun addDistance(current: Location?) {
-        // Add distance travelled
-
-        distance = song!!.distance // Get distance
-
-        if (oldLocation != null){
-            distance = distance!! + current!!.distanceTo(oldLocation)
-            println("distance = $distance")
-            oldLocation = Location(current)
-        } else {
-            oldLocation = Location(current)
-        }
-
-        song!!.distance =+ distance!! // update distance
-    }
-
-    private fun makeAlert(message: String, title:String = "You have leveled up!"){
-        // Makes a simple alert
-        val alertDialog = AlertDialog.Builder(this).create()
-        alertDialog.setTitle(title)
-        alertDialog.setMessage(message)
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
-        ) { dialog, which -> dialog.dismiss() }
-        alertDialog.show()
-    }
-
-    private fun updateLevel() {
-        // Updates map level if all words in present level are collected
-
-        val wordsCollected = song!!.words.size
-        val mapLevel = song!!.mapLevel
-        val totalWordsinLevel = song!!.mapWordCount[song!!.mapLevel]
-
-        if (mapLevel < 4){ // Total 4 levels
-            if (wordsCollected == totalWordsinLevel){
-                song!!.mapLevel += 1
-                when (song!!.mapLevel) { // User feedback
-                    2 -> makeAlert("You can now prioritise between \"boring\" and \"notboring\" words!")
-                    3 -> makeAlert("You are now shown interesting words!")
-                    4 -> makeAlert("This is the last lot of words from lyrics!")
-                    else -> makeAlert("ERROR: PLEASE REPORT.")
-                }
-                mMap.clear()
-                openCorrectMap()  // open next level of map
-                updateProgressBar() // show level has changed on progress bar
-            }
-        } else {
-            // All words collected
-            if (wordsCollected == totalWordsinLevel){
-                makeAlert("You have collected all the lyrics of this song! Try and guess now!","All Words Collected")
-            }
-        }
-    }
-
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-        mapView = mapFragment.view
-        mapFragment.getMapAsync(this)
-
-        mGoogleApiClient = GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build()
-
-        // Get song number to set everything according to it
-        song_number = intent.getIntExtra("ListClick",0)
-        song = MainActivity.songList[song_number!!-1]
-
-    }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        // Move to University Central Area
-        val centralArea = LatLng(55.944335, -3.1889770)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centralArea, 16F))
-
-        openCorrectMap()    // Load correct map based on map level and words collected
-
-        try {
-            mMap.isMyLocationEnabled = true
-        }catch (se: SecurityException) {
-            println("security exception thrown on [onMapReady]")
-        }
-
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-
-        changeMyLocationButtonPosition()   // Shift MyLocation button to the bottom
-
-    }
-
-    private fun openCorrectMap() {
-        // Open map k if MainActivity.songList[position-1] has map level = k
-        val mapFileName = "song_"+correct(song_number!!)+"_map${MainActivity.
-                songList[song_number!!-1].mapLevel}"
-        Log.d(tag,"Attempting to open file with name: $mapFileName")
-        val mapFile = openFileInput(mapFileName)
-        mapLayer = KmlLayer(mMap,mapFile,this)
-
-        // Here - Only show words which are not in caught words.
-        var counter = 0 // count number of words in this map level
-        val container = mapLayer!!.getContainers().iterator().next(); // get placemark container
-
-        for (placemark in container.placemarks) {
-            counter = counter + 1  // words found
-            // Get attributes
-            val point = placemark.geometry as KmlPoint
-            val name:String = placemark.getProperty("name")
-            // check if word not collected
-            if (name !in song!!.words) {
-                // Place on map according to description
-
-                val title = placemark.getProperty("description")
-                var style: String
-                val styleUrl = placemark.styleId
-
-                if (styleUrl == "#unclassified")
-                    style = "whtblank"
-                else if (styleUrl == "#boring")
-                    style = "ylwblank"
-                else if (styleUrl == "#notboring")
-                    style = "ylwcircle"
-                else if (styleUrl == "#interesting")
-                    style = "orangediamond"
-                else
-                    style = "redstars"
-
-                // get icon from resources based on style
-                val drawableId = resources.getIdentifier(style, "drawable", packageName)
-
-                // Place the marker on map
-                val m = mMap.addMarker(MarkerOptions().position(point.geometryObject)
-                        .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
-                markerList[m] = name
-            }
-        }
-        // mapWordCount[MapLevel] = num_of_words_in_map
-        song!!.mapWordCount[song!!.mapLevel] = counter
-        updateProgressBar()
-    }
-
-    private fun updateProgressBar(){
-        // Should be called with every change (in onLocationChanged)
-
-        val wordsCollected = song!!.words.size
-        val mapLevel = song!!.mapLevel
-        val totalWordsinSong = song!!.totalWords
-
-        textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinSong} Words Lvl: ${mapLevel}"
-
-    }
-
-    private fun correct(n:Int): String {
-        // Correct naming
-        if (n<10)
-            return "0"+n
-        else
-            return n.toString()
-    }
-
     private fun createLocationRequest(){
         //Set the parameters for location service
         val mLocationRequest = LocationRequest()
@@ -332,15 +122,137 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////
+    ////////////// Significant game implementation starts form here /////
+    ///////////////////////////////////////////////////////////////////
+
+    // Check if near any marker in markerList that is initialised in onMapReady.
+    // If near marker, remove marker, give user feedback and remove from markerList<Marker,String>.
+    // Check each time if  -
+    //  -- progress bar needs to be updated
+    //  -- map level has to be updated (and next map need to load?)
+    //  -- update percentage if needed
+    // Do -
+    //  -- Update distance travelled
+    override fun onLocationChanged(current: Location?) {
+        if (current == null) {
+            println("[$tag] [onLocationChanged] Location unknown")
+        } else {
+            println("""[$tag] [onLocationChanged] Lat/long now
+                (${current.latitude},
+                ${current.longitude})"""
+            )
+
+            // Check if near any marker. If near, remove the marker. Update  words for song.
+
+            val results = FloatArray(10) // store distance between current location and markers
+            var removeMarker: Marker? = null // Save marker here if needs to be deleted after the loop
+
+            for ((marker,w) in markerList) {
+
+                Location.distanceBetween(current.latitude,current.longitude, // Save result to results[0]
+                        marker.position.latitude,marker.position.longitude,results)
+
+                if (results[0] <= current.accuracy && results[0] <= 10) { // as accurate as possible, at least10 metres
+
+                    marker.remove() //remove this marker from map
+
+                    // Get the word from lyrics (row:column --> word)
+                    val lyr = Lyrics(this,song_number!!)
+                    val word = lyr.getWord(w)
+
+                    // Add word to collected word list
+                    song!!.words += w
+
+                    // User feedback
+                    Toast.makeText(this, "Word Added: ${word}", Toast.LENGTH_SHORT).show()
+
+                    removeMarker = marker    // No need to check distance with this marker again.
+                }
+            }
+
+            markerList.remove(removeMarker) // removing this marker from list
+
+            updateLevel() // check -- need to update level?
+
+            updateProgressBar() // progress bar needs to update?
+
+            // For distacne travelled
+            if (current.accuracy < 30) {
+                // Don't want noise (initial noise -- tested on real device) -
+                // Can be set lower than 30, but won't work with kml trail given (and in emulator.)
+                addDistance(current)
+            }
+
+            song!!.setPercentageComplete() // change percentage complete?
+
+        }
+    }
+
+
+    // Get which puzzle user has selected and point song to the correct Song object.
+    // Rest has to deal with map.
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_maps)
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+                .findFragmentById(R.id.map) as SupportMapFragment
+        mapView = mapFragment.view
+        mapFragment.getMapAsync(this)
+
+        mGoogleApiClient = GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build()
+
+        ///////////////////
+
+        // Get song number to set everything according to it
+        song_number = intent.getIntExtra("ListClick",0)
+        song = MainActivity.songList[song_number!!-1] // get pointer to the song object
+
+    }
+
+    // Opens correct map using helper function openCorrectMap()
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Move to University Central Area
+        val centralArea = LatLng(55.944335, -3.1889770)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centralArea, 16F))
+
+        openCorrectMap()    // Load correct map based on map level and words collected
+
+        try {
+            mMap.isMyLocationEnabled = true
+        }catch (se: SecurityException) {
+            println("security exception thrown on [onMapReady]")
+        }
+
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+
+        //////////////////////
+
+        changeMyLocationButtonPosition()   // Shift MyLocation button to the bottom
+
+    }
+
+
     override fun onStart() {
         super.onStart()
         mGoogleApiClient.connect()
     }
 
+    // Any changes to the Song object is saved so that they are available when app is reopened.
     override fun onStop() {
         super.onStop()
         if (mGoogleApiClient.isConnected)
             mGoogleApiClient.disconnect()
+
+        ///////////////// Store changes ///////////////////
 
         // Store Collected words
         val sharedPref = getSharedPreferences("collectedWords",Context.MODE_PRIVATE)
@@ -363,7 +275,167 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         editor3.commit()
     }
 
-    private fun changeMyLocationButtonPosition(){ // My location button is moved to right bottom
+    /////////////////////////////////////////////////
+    //////////  Helper Functions  ///////////////////
+    /////////////////////////////////////////////////
+
+
+    // Called in omMapReady() and in updateLevel() levels up on map.
+    // Checks song.mapLevel and open the correct kml file.
+    // Shows marker for only those words which are not yet collected.
+    // Also populates marketList<Map, String> -- so that distance with all markers can be computed
+    // onLocationChanged.
+    private fun openCorrectMap() {
+
+        // Open map k if MainActivity.songList[position-1] has map level = k
+        val mapFileName = "song_"+correct(song_number!!)+"_map${song!!.mapLevel}"
+        Log.d(tag,"Attempting to open file with name: $mapFileName")
+        val mapFile = openFileInput(mapFileName)
+
+        mapLayer = KmlLayer(mMap,mapFile,this)
+
+        // Here - Only show words which are not in caught words.
+        var counter = 0 // count number of words in this map level
+        val container = mapLayer!!.getContainers().iterator().next(); // get placemark container
+
+        for (placemark in container.placemarks) {
+
+            counter += 1  // words found
+            // Get attributes
+            val point = placemark.geometry as KmlPoint
+            val name:String = placemark.getProperty("name")
+
+            // check if word not collected
+            if (name !in song!!.words) {
+
+                // Place on map according to description
+                val title = placemark.getProperty("description")
+                var style: String
+                val styleUrl = placemark.styleId
+
+                if (styleUrl == "#unclassified")
+                    style = "whtblank"
+                else if (styleUrl == "#boring")
+                    style = "ylwblank"
+                else if (styleUrl == "#notboring")
+                    style = "ylwcircle"
+                else if (styleUrl == "#interesting")
+                    style = "orangediamond"
+                else
+                    style = "redstars"
+
+                // get icon from resources based on style
+                val drawableId = resources.getIdentifier(style, "drawable", packageName)
+
+                // Place the marker on map
+                val m = mMap.addMarker(MarkerOptions().position(point.geometryObject)
+                        .title(title).icon(BitmapDescriptorFactory.fromResource(drawableId)))
+
+                markerList[m] = name // Add to markerList<Marker,String>
+            }
+        }
+
+        // song.mapWordCount used to check if level has upped? If number of collected words is equal
+        // to words in this level, increment map Level
+        song!!.mapWordCount[song!!.mapLevel] = counter
+
+        updateProgressBar()
+    }
+
+
+    // Called in onLocationCheanged. Update location travelled for this puzzle.
+    // Each Song has a distance which is updates each time location changes.
+    private fun addDistance(current: Location?) {
+        // Add distance travelled
+
+        distance = song!!.distance // Get song.distance
+
+        if (oldLocation != null){
+            distance = distance!! + current!!.distanceTo(oldLocation)
+            println("distance = $distance")
+            oldLocation = Location(current)
+        } else {
+            oldLocation = Location(current)
+        }
+
+        song!!.distance =+ distance!! // update song.distance
+    }
+
+    // Check if need to update Song.mapLevel
+    // Open next map if level upped.
+    // Update the progress bar accordingly.
+    // User feedback if level upped.
+    private fun updateLevel() {
+        // Updates map level if all words in present level are collected
+
+        val wordsCollected = song!!.words.size
+        val mapLevel = song!!.mapLevel
+        val totalWordsinLevel = song!!.mapWordCount[song!!.mapLevel]
+
+        if (mapLevel < 4){ // Total 4 levels
+            if (wordsCollected == totalWordsinLevel){
+
+                song!!.mapLevel += 1
+
+                when (song!!.mapLevel) { // User feedback
+                    2 -> makeAlert("You can now prioritise between \"boring\" and \"notboring\" words!")
+                    3 -> makeAlert("You are now shown interesting words!")
+                    4 -> makeAlert("This is the last lot of words from lyrics!")
+                    else -> makeAlert("ERROR: PLEASE REPORT.")
+                }
+
+                mMap.clear() // If testing on emulator directly with kml of maps (never possible in reality)
+                // i.e. jumping from one marker to another, some marker were skipped (not removed).
+                // This makes sure that doesn't become awkward.
+
+                openCorrectMap()  // open next level of map
+                updateProgressBar() // show level has changed on progress bar
+            }
+        } else {
+            // Last Level
+            if (wordsCollected == totalWordsinLevel) {
+                // All words have been collected.
+                makeAlert("You have collected all the lyrics of this song! Try and guess now!","All Words Collected")
+            }
+        }
+    }
+
+    // Helper function to make alerts. Mainly used for level updates.
+    private fun makeAlert(message: String, title:String = "You have leveled up!"){
+        // Makes a simple alert
+        val alertDialog = AlertDialog.Builder(this).create()
+        alertDialog.setTitle(title)
+        alertDialog.setMessage(message)
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
+        ) { dialog, which -> dialog.dismiss() }
+        alertDialog.show()
+    }
+
+
+    // Updates the progress bar with number of collected words and map level
+    private fun updateProgressBar(){
+        // Should be called with every change (in onLocationChanged)
+
+        val wordsCollected = song!!.words.size
+        val mapLevel = song!!.mapLevel
+        val totalWordsinSong = song!!.totalWords
+
+        textViewProgress.text = "Song ${song_number}: ${wordsCollected}/${totalWordsinSong} Words Lvl: ${mapLevel}"
+
+    }
+
+    // Helper function for changing 1 --> 01 2--> 02 and so on.
+    // So that file naming is uniform.
+    private fun correct(n:Int): String {
+        // Correct naming
+        if (n<10)
+            return "0"+n
+        else
+            return n.toString()
+    }
+
+    // My location button is moved to right bottom
+    private fun changeMyLocationButtonPosition(){
         if (mapView != null && mapView!!.findViewById<View>(Integer.parseInt("1")) != null) {
             // Get the button view
             val locationButton = (mapView!!.findViewById<View>(Integer.parseInt("1")).getParent()
@@ -377,9 +449,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         }
     }
 
-    fun showGuessActivity(view: View){  // Shows guess activity
+    ///////////////////////////////////////////////////////
+    /////// For Guess! button and progress bar tap ////////
+    ///////////////////////////////////////////////////////
 
-        // Get map5's very-interesting words if any and send as hints to guess activity
+    fun showGuessActivity(view: View){
+
+        // Get map5's very-interesting words, if any and send as hints to guess activity
+        // If empty list is sent, get hint button is not shown.
+        // User can anyway give up if he has reached level 4.
         val mapFileName = "song_"+correct(song_number!!)+"_map5"
         val lst = ArrayList<String>()
         val mapFile = openFileInput(mapFileName)
@@ -392,13 +470,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 lst.add(name)
             }
         }
-        // Launch guess activity with
+
+        // Launch guess activity
         val intent = Intent(this,GuessActivity::class.java)
         intent.putExtra("songNumber",song_number!!)
         intent.putExtra("guessWords",lst)
         startActivity(intent)
     }
 
+    // Tapping progress bar centres map at George square
     fun centreAtGeorgeSquare(view:View){
         val centralArea = LatLng(55.944335, -3.1889770)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centralArea, 16F))

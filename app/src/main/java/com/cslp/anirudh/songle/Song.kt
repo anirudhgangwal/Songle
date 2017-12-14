@@ -188,7 +188,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     }
 
     fun setPercentageComplete() { // percentage complete
-        percentageComplete = "%.2f".format(words.size.toFloat()/totalWords!!*100)
+        percentageComplete = "%.2f".format(words.size.toFloat()/totalWords*100)
     }
 
     private fun isNetworkAvailable(): Boolean { // network available?
