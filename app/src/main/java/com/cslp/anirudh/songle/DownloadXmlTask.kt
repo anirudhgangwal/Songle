@@ -13,6 +13,9 @@ import java.io.InputStreamReader
 
 /**
  * Created by anirudh on 06/11/17.
+ *
+ * Downloads file from given URL
+ *
  */
 
 class DownloadXmlTask(private val caller: DownloadCompleteListener) :
@@ -34,7 +37,6 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
     private fun loadXmlFromNetwork(urlString: String?): String {
         Log.d(tag,"load xml from network ...")
         val result = downloadUrl(urlString)
-        // Do something with stream e.g. parse as XML, build result
 
         Log.d(tag,"loadXmlFromNetwork returns "+ result)
         return result
@@ -42,16 +44,17 @@ class DownloadXmlTask(private val caller: DownloadCompleteListener) :
 
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String?): String {
+
         Log.d(tag,"download url ...")
         val url = URL(urlString)
-        // Starts the query
+
         val inp = url.openStream()
         val reader = BufferedReader(InputStreamReader(inp))
         val result = StringBuilder()
         var line: String? = reader.readLine()
         while (line != null) {
 
-            result.append(line)
+            result.append(line) // no need for newline characters for XML
             line = reader.readLine()
         }
 

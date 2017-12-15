@@ -1,6 +1,5 @@
 package com.cslp.anirudh.songle
 
-import android.Manifest
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -11,14 +10,21 @@ import android.net.ConnectivityManager
 import android.support.v4.content.ContextCompat
 import android.support.design.widget.Snackbar
 import android.widget.Toast
-import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
-import android.R.id.edit
-import android.content.SharedPreferences
 
 
-
-
+/**
+ *
+ * Downloads songs.xml and parses it to initialise Song objects. Each Song object does only the
+ * minimal required. Does not re-download maps or lyrics... or attributes. They are picked from
+ * internal storage and Shared preference -- see Song.kt
+ *
+ * Checks for internet access and doesn't let player continue until Song(s) data is initialised.
+ * If data is available, then user may continue but he is still made aware that internet connection
+ * has issues. Of course, with no internet, user may get stuck when map does not load -- but no
+ * awkward errors or fatal errors will be encountered by user.
+ *
+ *
+ */
 class MainActivity : AppCompatActivity() {
 
     companion object {
@@ -31,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Show Intro Activity only the very first time app launches.
         val sp = getSharedPreferences("Intro", Context.MODE_PRIVATE)
         if (!sp.getBoolean("first", false)) {
             val editor = sp.edit()
@@ -61,8 +68,10 @@ class MainActivity : AppCompatActivity() {
         val snackbar = Snackbar.make(findViewById(android.R.id.content),
                 "No internet connection.",
                 Snackbar.LENGTH_INDEFINITE)
+
         snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
                 R.color.colorAccent))
+
         snackbar.setAction(R.string.try_again, View.OnClickListener {
             if (isNetworkAvailable()){  // User may click bar to retry song.xml download
                 downloadSongList()
@@ -72,6 +81,8 @@ class MainActivity : AppCompatActivity() {
         }).show()
     }
 
+    // Launch ListOfSongs activity where user can choose and review progress with all puzzles.
+    // Activity launched on clicking Play
     fun showListOfSongs(view: View) {
         // Starts Puzzle list activity
         if (!songList.isEmpty()){
@@ -85,16 +96,19 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // Show Stats activity
     fun showStats(view: View) { // start stats activity
         val intent = Intent(this,StatsActivity::class.java)
         startActivity(intent)
     }
 
+    // Show setting activity
     fun showSettings(view: View){ // start settings activity
         val intent = Intent(this,SettingsActivity::class.java)
         startActivity(intent)
     }
 
+    // Helper function to check if network is available.
     private fun isNetworkAvailable(): Boolean {
         // Network available?
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -102,17 +116,19 @@ class MainActivity : AppCompatActivity() {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
+    // Downloads songs.xml and set songList: List<Song> -- each song initializes further details itself
     private fun downloadSongList() {
         if (MainActivity.isListSet == false) {
             Log.d(tag, "Network available")
-            val listener = SongDownloadListener(this)
+            val listener = SongDownloadListener(this) // Makes list of Song objects from xml
             val downloader = DownloadXmlTask(listener)
             downloader.execute("http://www.inf.ed.ac.uk/teaching/courses/cslp/data/songs/songs.xml")
-            MainActivity.isListSet = true
+            MainActivity.isListSet = true // Don't do this again until app is closed and launched.
         }
     }
 
-    override fun onBackPressed() { // Back button from home should exit the app
+    // Back button from home should exit the app
+    override fun onBackPressed() {
         val intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_HOME)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

@@ -5,11 +5,14 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import android.content.DialogInterface
 import android.support.v7.app.AlertDialog
 
 
-
+/**
+ *
+ * Setting activity - Rest game data.
+ *
+ */
 class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +20,9 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
     }
 
+    // on click - Remove all distance data
     fun resetDistanceStats(view:View){
+        // Alert and confirm.
         AlertDialog.Builder(this)
                 .setTitle("Delete distance data?")
                 .setMessage("This will remove all distance travelled data. OK?")
@@ -27,6 +32,7 @@ class SettingsActivity : AppCompatActivity() {
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
+    // on click -- Rest all progress
     fun resetGameProgress(view:View){
         AlertDialog.Builder(this)
                 .setTitle("Delete All Progress")
@@ -37,10 +43,13 @@ class SettingsActivity : AppCompatActivity() {
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
+    // Helper function to delete distance data
     fun resetDistance(){
         for (song in MainActivity.songList){
+            // set distance 0 for all songs
             song.distance = 0f
         }
+        // Remove from shared preference
         val sharedPref = getSharedPreferences("distance", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         editor.clear()
@@ -50,16 +59,21 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     fun resetAllProgress(){
+
         resetDistance()
 
         for (song in MainActivity.songList){
+            // set level, guessed and words collected to default values.
             song.guessed = false
             song.mapLevel = 1
             song.words = setOf()
             song.setPercentageComplete()
+            // only leave first 3 unlocked.
             if (song.number.toInt() > 3)
                 song.unlocked = false
         }
+
+        // Remove all from shared preference
         val sharedPref = getSharedPreferences("guessedSongs", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         editor.clear()

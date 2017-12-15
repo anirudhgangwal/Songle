@@ -10,6 +10,11 @@ import java.nio.file.Paths
 
 /**
  * Created by anirudh on 07/12/17.
+ *
+ * Given song_number, objects of this type can covert "row:column" to words with getWord()
+ *
+ * getTotalWordCount() return total words in song.
+ *
  */
 class Lyrics (val ctx:Context,val song_number: Int) {
 
@@ -18,27 +23,32 @@ class Lyrics (val ctx:Context,val song_number: Int) {
     fun getWord(location:String):String{
         val FILENAME = "${correct(song_number)}Lyrics"
 
-        if (FILENAME in ctx.fileList()){
-            val file = ctx.openFileInput(FILENAME)
+        if (FILENAME in ctx.fileList()) { // check lyrics for this song is available
 
+            val file = ctx.openFileInput(FILENAME)
             val reader = InputStreamReader(file)
+
+            // all lines
             var lines = reader.readLines()
+
             print("LINES $song_number \n${lines}")
+
             var row = -1
             var column = -1
+
+            // get row and column from "row:column"
             row = location.split(":")[0].toInt()
             column = location.split(":")[1].toInt()
-            //println("location = $location row = $row col = $column ")
+
+            // line number and number seperated by tab character.
             val line = lines[row-1].split("\t")[1]
-            //println("line = $line")
+
 
             file.close()
 
             return line.split(" ")[column-1]
 
-
-
-        } else {
+        } else {  // should never happen
             return "ERROR: LYRICS NOT FOUND."
         }
     }
@@ -70,6 +80,7 @@ class Lyrics (val ctx:Context,val song_number: Int) {
         }
     }
 
+    // Correct naming.
     private fun correct(index:Int):String{
         if(index<10){
             return "0${index}"

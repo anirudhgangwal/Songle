@@ -12,12 +12,17 @@ import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_correct.*
 
-
+/**
+ *  Activity shown when user guesses correctly.
+ *
+ *
+ */
 class CorrectActivity : AppCompatActivity() {
 
     private var song_number: Int? = null
-    val tag = "CorrectActivity"
-    var videoId = ""
+    private val tag = "CorrectActivity"
+    private var videoId = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_correct)
@@ -31,11 +36,12 @@ class CorrectActivity : AppCompatActivity() {
         textView13.text = "Distance covered: %.0f Meters".format(song.distance)
     }
 
-
+    // onClick() for VIDEO
     fun showVideo(view: View){
         watchYoutubeVideo(this,videoId)
     }
 
+    // Launch video on youtube app
     private fun watchYoutubeVideo(context: Context, id: String) {
         val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id))
         val webIntent = Intent(Intent.ACTION_VIEW,
@@ -47,17 +53,19 @@ class CorrectActivity : AppCompatActivity() {
         }
     }
 
+    // Get video ID from url
     fun getVideoId(link : String):String{
-        //https://youtu.be/fJ9rUzIMcZQ
+
         var id = ""
         for (i in 0..link.length-1){
             if (i>16)
                 id = id+link[i]
         }
-        Log.d(tag,"Anirudh returned id: $id original link: $link")
+        Log.d(tag,"returned id: $id original link: $link")
         return id
     }
 
+    // on click BACK TO HOME
     fun backToHome(view: View){
         Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT) // Feedback
         val intent = Intent(this,MainActivity::class.java)
@@ -65,6 +73,7 @@ class CorrectActivity : AppCompatActivity() {
 
     }
 
+    // Take back to home screen
     override fun onBackPressed() {
         super.onBackPressed()
         Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT) // Feedback

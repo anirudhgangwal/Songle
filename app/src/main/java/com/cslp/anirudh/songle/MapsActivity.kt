@@ -8,8 +8,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.ConnectivityManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -214,6 +216,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
         song_number = intent.getIntExtra("ListClick",0)
         song = MainActivity.songList[song_number!!-1] // get pointer to the song object
 
+
+
     }
 
     // Opens correct map using helper function openCorrectMap()
@@ -244,6 +248,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     override fun onStart() {
         super.onStart()
         mGoogleApiClient.connect()
+
+        if (!isNetworkAvailable())
+            makeSnackBar()
     }
 
     // Any changes to the Song object is saved so that they are available when app is reopened.
@@ -447,6 +454,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
             layoutParams.setMargins(0, 0, 30, 30)
         }
+    }
+
+    // Simple snack bar with "no internet connection"
+    fun makeSnackBar(){
+
+        val snackbar = Snackbar.make(findViewById(android.R.id.content),
+                "No internet connection.",
+                Snackbar.LENGTH_LONG)
+
+        snackbar.setActionTextColor(ContextCompat.getColor(applicationContext,
+                R.color.colorAccent)).show()
+    }
+
+    // Helper function to check if network is available.
+    private fun isNetworkAvailable(): Boolean {
+
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     ///////////////////////////////////////////////////////

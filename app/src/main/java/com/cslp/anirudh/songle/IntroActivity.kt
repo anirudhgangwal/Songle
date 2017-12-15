@@ -12,21 +12,20 @@ import com.github.paolorotolo.appintro.AppIntro2Fragment
 /**
  * Created by anirudh on 12/12/17.
  *
- * Intro to be showed first time
+ * Intro to be showed first time.
+ *
+ * Based on -->
+ *  AppIntro 4.2.2 - https://github.com/apl-devs/AppIntro
  */
 class IntroActivity: AppIntro() {
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /**
-         * setFadeAnimation()
-        setZoomAnimation()
-        setFlowAnimation()
-        setSlideOverAnimation()
-        setDepthAnimation()
-         */
+
+        // Ask for map permission after map slide (3rd) slide, after
         askForPermissions(arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION), 3)
 
+        // Descriptions for Slides.
         val descr1= "Unlock a new puzzle each time you successfully guess one!"
         val descr2= "You play in the real world, so get out and roam the University's central area! " +
                 "Tap the progress bar to come back to the playing-area. Tap the guess button " +
@@ -34,6 +33,7 @@ class IntroActivity: AppIntro() {
         val descr3 = "Glance at your activity stats anytime from the home screen."
         val descr4 = "Please ensure active internet connection while playing Songle."
 
+        // Add slide with Title, description and image
         addSlide(AppIntro2Fragment.newInstance("Songle", "Continue to get an overview.",
                 R.drawable.image_yay,resources.getColor(R.color.accent_material_light)))
         addSlide(AppIntro2Fragment.newInstance("Unlock More Puzzles As You Play Along", descr1,
@@ -46,9 +46,11 @@ class IntroActivity: AppIntro() {
                 R.drawable.walking,resources.getColor(R.color.intro3)))
 
         showStatusBar(false)
-        //setDepthAnimation()
+
         showBackButtonWithDone = true
+
         setFadeAnimation()
+
         backButtonVisibilityWithDone = true
 
 
@@ -67,8 +69,4 @@ class IntroActivity: AppIntro() {
         finish()
     }
 
-    override fun onSlideChanged(oldFragment: Fragment?,newFragment: Fragment?) {
-        super.onSlideChanged(oldFragment, newFragment)
-        // Do something when the slide changes.
-    }
 }

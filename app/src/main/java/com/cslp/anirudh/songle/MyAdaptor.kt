@@ -12,6 +12,10 @@ import android.widget.BaseAdapter
 @Suppress("DEPRECATION")
 /**
  * Created by anirudh on 06/11/17.
+ *
+ * Custom List adaptor for ListOfSongs -- Show song name and percentage complete using list of Song
+ *
+ *
  */
 
 class MyAdapter(private val context: Context, private val songs: ArrayList<Song>) : BaseAdapter() {
@@ -44,7 +48,7 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
         val text1 = twoLineListItem.text1
         val text2 = twoLineListItem.text2
 
-        if (songs[position].guessed == true){
+        if (songs[position].guessed == true) { // If guessed, percentage complete is 100%
             text1.text = (songs[position].getNumberName()) + " - ${songs[position].title} by ${songs[position].artist}"
             text2.text = "100%" + " Complete"
         } else {
@@ -52,12 +56,9 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
             text2.text = "${songs[position].percentageComplete}%" + " Complete"
         }
 
-
-        // Use a function to find % complete
-
+        // change color to differentiate enabled and disabled list items. User feedback.
         if(isEnabled(position)) {
             twoLineListItem.setBackgroundColor(parent.getResources().getColor(R.color.active_list_item));
-            //twoLineListItem.background = ColorfulListItemDrawable(R.color.abc_tint_spinner)
         } else {
             twoLineListItem.setBackgroundColor(parent.getResources().getColor(R.color.inactive_list_item));
         }
@@ -66,17 +67,12 @@ class MyAdapter(private val context: Context, private val songs: ArrayList<Song>
     }
 
     override fun isEnabled(position: Int): Boolean {
+        // is enabled based on unlocked status -- see song.kt
         return MainActivity.songList[position].unlocked
     }
 
     override fun areAllItemsEnabled(): Boolean {
         return false
     }
-
-    public fun update(){
-        notifyDataSetChanged()
-    }
-
-
 
 }
