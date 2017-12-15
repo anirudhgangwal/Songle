@@ -12,6 +12,9 @@ import java.net.URL
 
 /**
  * Created by anirudh on 08/12/17.
+ *
+ * Different from DownloadXml task as new line characters are kept for lyrics.
+ *
  */
 class DownloadWordsTask(private val caller: DownloadCompleteListener2) :
         AsyncTask<String, Void, List<String>>() {

@@ -16,7 +16,7 @@ import java.sql.Timestamp
  *
  * Represents a song.
  *
- * No need to check time stamp - if files exist, they are simply not redownloaded again.
+ * No need to check time stamp - if files exist, they are simply not re-downloaded again.
  *
  * Self contained with all information about itself.
  */
@@ -24,14 +24,15 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
     val tag = "Song"
 
     // These will be set in init {..} below.
+    // They are set as needed. Some in MapsActivity
     var percentageComplete = "0.00" // words collected by total words in this song.
     var unlocked = false    // is this song playable yet?
-    var guessed = false
-    var distance:Float = 0f
-    var mapLevel = 1
+    var guessed = false     // has user guessed this song
+    var distance:Float = 0f // distance travelled by user playing this puzzle
+    var mapLevel = 1        // User has reached which map level?
     var words: Set<String> = setOf() // words collected by user
-    var mapWordCount = HashMap<Int,Int>() // set in MapsActivity as maps are used.
-    var totalWords = 0
+    var mapWordCount = HashMap<Int,Int>() // How many words in map1, map2 ... map5 ?
+    var totalWords = 0      // total words in this song
 
 
     fun getNumberName(): String = "Puzzle " + number // Used when displaying puzzles
@@ -42,19 +43,23 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     init {
         // Initialise everything here. Files downloaded only in the first run. On subsequent runs,
-        // they are taken from internal storage.
+        // they are taken from internal storage. Other values are set from sharedPreference. Some
+        // values are computed from stored values.
         //
-        // 1. All 5 maps are loaded.
-        // 2. first three puzzles are set unlocked (playable) default. Other songs become unlocked in ListOfSongs AActivity
-        // 3. Map Level is updated
-        // 4. Collected words are restored
-        // 5. Distance traveled for solving particular song is read
-        // 6. Check if song has been guessed before and do needful
-        // 7. Set total words
+        // Here is a list --
+        //
+        // 1. All 5 maps already downloaded? yes - ok no - download them (internal storage)
+        // 2. first three puzzles are set unlocked = true (playable) default. Other songs become unlocked
+        //      in ListOfSongs Activity based on how many puzzle s have user solved.
+        // 3. Map Level is updated (shared preference)
+        // 4. Collected words are restored (shared preference)
+        // 5. Distance traveled for solving particular song is read (shared preference)
+        // 6. Check if song has been guessed before and do needful (shared preference)
+        // 7. Set total words   (calculate by using Lyrics class)
 
         initialMapsAndLyricsDownload()  // only if not already downloaded on the first run.
 
-        if (number.toInt() <= 3)
+        if (number.toInt() <= 3)    // first three puzzles always playable
             unlocked = true
 
         updateMapLevel()
@@ -68,10 +73,16 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
             // - case, this is done after async task is complete by Download Listener
             val lyr = Lyrics(ctx,number.toInt())
             totalWords = lyr.getTotalWordCount()  // get total words from lyrics
-            setPercentageComplete()
+
+            setPercentageComplete() // cpmpute percentage from total words and num of words collected
         }
 
     }
+
+    /////////////////////////////////////////////
+    /////// Functions ///////////////////////////
+    /////////////////////////////////////////////
+
 
     private fun updateDistance() {  // Get distance from shared preference
         val sharedPref = ctx.getSharedPreferences("distance",Context.MODE_PRIVATE)
@@ -109,6 +120,10 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         totalWords = lyr.getTotalWordCount()
 
 
+    }
+
+    fun setPercentageComplete() { // percentage complete
+        percentageComplete = "%.2f".format(words.size.toFloat()/totalWords*100)
     }
 
     private fun initialMapsAndLyricsDownload(){ // download everything if not already downloaded.
@@ -160,7 +175,8 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         }
     }
 
-    fun saveLyrics(result: List<String>){ // Save lyrics (words.txt)
+    // Save lyrics (words.txt)
+    fun saveLyrics(result: List<String>){
         val FILENAME = "${number}Lyrics"
 
         Log.d(tag, "Writing file with name: $FILENAME")
@@ -168,14 +184,15 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
         val fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE)
         var lines = ""
         for (line in result){
-            lines = lines + line + "\n"
+            lines = lines + line + "\n" // Note new line character needed here
         }
         fos.write(lines.toByteArray())
         fos.close()
 
     }
 
-    fun setMap(kmlString: String, mapNum:Int){ // save maps
+    // save maps - eg. song_1_map1 song_1_map2 ... song_2_map1 ....
+    fun setMap(kmlString: String, mapNum:Int){
         val FILENAME = "song_"+number+"_map$mapNum"
 
         Log.d(tag, "Writing file with name: $FILENAME")
@@ -187,11 +204,8 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 
     }
 
-    fun setPercentageComplete() { // percentage complete
-        percentageComplete = "%.2f".format(words.size.toFloat()/totalWords*100)
-    }
-
-    private fun isNetworkAvailable(): Boolean { // network available?
+    // Helper function --  network available?
+    private fun isNetworkAvailable(): Boolean {
         val connectivityManager =  ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected

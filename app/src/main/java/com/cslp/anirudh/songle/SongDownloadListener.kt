@@ -15,8 +15,15 @@ import java.time.format.DateTimeFormatter
 
 /**
  * Created by anirudh on 07/11/17.
+ *
+ * Parses songs.xml each time app starts. No need to check timestamp as parsing initializes all
+ * Song objects (only once). Each Song object in turn only does what is necessary and new. Already downloaded
+ * and set setting are read from local storage / shared preference -- see Song.kt
+ *
+ *
  */
 class SongDownloadListener(private val context: Context) : DownloadCompleteListener{
+
     override fun downloadComplete(result: String) {
         Log.i("SongDownloadListener",result)
         MainActivity.songList =  parseXml(result)
