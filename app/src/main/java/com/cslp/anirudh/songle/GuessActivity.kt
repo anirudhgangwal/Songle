@@ -77,6 +77,10 @@ class GuessActivity : AppCompatActivity() {
         if (hintWords.size == 0){
             button9.visibility = View.INVISIBLE
         }
+
+        if (MainActivity.songList[song_number!!-1].guessed){
+            showAnswer()
+        }
     }
 
     // Sentence builder -- reset sentence
@@ -110,6 +114,17 @@ class GuessActivity : AppCompatActivity() {
 
     // Give up -- Show correct answer on editText
     fun giveUp(view:View){
+        AlertDialog.Builder(this)   // Confirm ?
+                .setTitle("Give-up?")
+                .setMessage("Are you sure you want to give up?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, {
+                    dialog, whichButton -> showAnswer() })
+                .setNegativeButton(android.R.string.no, null).show()
+    }
+
+
+    fun showAnswer(){
         editText.setText(MainActivity.songList[song_number!!-1].title)
     }
 
