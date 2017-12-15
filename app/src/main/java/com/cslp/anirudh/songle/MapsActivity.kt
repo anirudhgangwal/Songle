@@ -52,14 +52,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     private lateinit var mGoogleApiClient: GoogleApiClient
     private var mapView: View? = null
 
-    val permissionsRequestAccessFineLocation = 1
-    var mLastLocation: Location? = null
-    var song_number:Int? = null
-    var mapLayer: KmlLayer? = null
-    var oldLocation: Location? = null
-    var distance:Float? = null
+    private val permissionsRequestAccessFineLocation = 1
+    private var mLastLocation: Location? = null
+    private var song_number:Int? = null
+    private var mapLayer: KmlLayer? = null
+    private var oldLocation: Location? = null
+    private var distance:Float? = null
     // map of markers that are currently shown on map to their name "row:column"
-    var markerList = HashMap<Marker,String>()
+    private var markerList = HashMap<Marker,String>()
     var song: Song? = null
 
 
@@ -320,16 +320,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
                 var style: String
                 val styleUrl = placemark.styleId
 
-                if (styleUrl == "#unclassified")
-                    style = "whtblank"
+                style = if (styleUrl == "#unclassified")
+                    "whtblank"
                 else if (styleUrl == "#boring")
-                    style = "ylwblank"
+                    "ylwblank"
                 else if (styleUrl == "#notboring")
-                    style = "ylwcircle"
+                    "ylwcircle"
                 else if (styleUrl == "#interesting")
-                    style = "orangediamond"
+                    "orangediamond"
                 else
-                    style = "redstars"
+                    "redstars"
 
                 // get icon from resources based on style
                 val drawableId = resources.getIdentifier(style, "drawable", packageName)
@@ -435,10 +435,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     // So that file naming is uniform.
     private fun correct(n:Int): String {
         // Correct naming
-        if (n<10)
-            return "0"+n
+        return if (n<10)
+            "0"+n
         else
-            return n.toString()
+            n.toString()
     }
 
     // My location button is moved to right bottom
@@ -457,7 +457,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleApiClient.Co
     }
 
     // Simple snack bar with "no internet connection"
-    fun makeSnackBar(){
+    private fun makeSnackBar(){
 
         val snackbar = Snackbar.make(findViewById(android.R.id.content),
                 "No internet connection.",

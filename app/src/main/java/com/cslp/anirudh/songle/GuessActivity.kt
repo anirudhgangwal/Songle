@@ -38,20 +38,20 @@ class GuessActivity : AppCompatActivity() {
         Log.d(tag,"song_number = $song_number")
 
         // Change list of words of form "row:column" to actual words
-        var lyr = Lyrics(this,song_number!!)
+        val lyr = Lyrics(this,song_number!!)
         var listOfWords = MainActivity.songList[song_number!!-1].words.map { w ->
             lyr.getWord(w)
         }
 
         // FOr user feedback -- no words have been collected.
-        if (listOfWords.size == 0){
+        if (listOfWords.isEmpty()){
             listOfWords += "NO WORDS COLLECTED YET"
         }
 
         // Get the list fragment
-        var listFragment = fragmentManager.findFragmentById(R.id.list) as ListFragment
+        val listFragment = fragmentManager.findFragmentById(R.id.list) as ListFragment
         // Use listOfWords defined above with array adaptor
-        var myAdapter = ArrayAdapter<String>(this,
+        val myAdapter = ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,listOfWords)
         // Set list's adaptor
         listFragment.listAdapter = myAdapter
@@ -124,7 +124,7 @@ class GuessActivity : AppCompatActivity() {
     }
 
 
-    fun showAnswer(){
+    private fun showAnswer(){
         editText.setText(MainActivity.songList[song_number!!-1].title)
     }
 
@@ -132,7 +132,7 @@ class GuessActivity : AppCompatActivity() {
     // Lets user know if song was incorrect.
     fun showCorrect(view: View) {
 
-        var correctGuess = MainActivity.songList[song_number!!-1].title
+        val correctGuess = MainActivity.songList[song_number!!-1].title
 
         if (editText.text.toString().toLowerCase() == correctGuess.toLowerCase()) {
 

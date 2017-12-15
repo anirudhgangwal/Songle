@@ -16,7 +16,7 @@ import java.nio.file.Paths
  * getTotalWordCount() return total words in song.
  *
  */
-class Lyrics (val ctx:Context,val song_number: Int) {
+class Lyrics (private val ctx:Context, private val song_number: Int) {
 
     val tag = "Lyrics"
 
@@ -29,7 +29,7 @@ class Lyrics (val ctx:Context,val song_number: Int) {
             val reader = InputStreamReader(file)
 
             // all lines
-            var lines = reader.readLines()
+            val lines = reader.readLines()
 
             print("LINES $song_number \n${lines}")
 
@@ -61,12 +61,12 @@ class Lyrics (val ctx:Context,val song_number: Int) {
 
             var count = 0
             val reader = InputStreamReader(file)
-            var lines = reader.readLines()
+            val lines = reader.readLines()
             for (line in lines){
 
                 var wordsInLine = 0
                 for (word in line.split("\t")[1].split(" ")){
-                    if (word.trim().length > 0)
+                    if (word.trim().isNotEmpty())
                         wordsInLine += 1
                 }
                 count += wordsInLine
@@ -82,10 +82,10 @@ class Lyrics (val ctx:Context,val song_number: Int) {
 
     // Correct naming.
     private fun correct(index:Int):String{
-        if(index<10){
-            return "0${index}"
+        return if(index<10){
+            "0${index}"
         } else {
-            return (index).toString()
+            (index).toString()
         }
     }
 }

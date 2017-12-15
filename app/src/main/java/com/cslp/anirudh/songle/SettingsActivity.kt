@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     // Helper function to delete distance data
-    fun resetDistance(){
+    private fun resetDistance(){
         for (song in MainActivity.songList){
             // set distance 0 for all songs
             song.distance = 0f
@@ -55,10 +55,10 @@ class SettingsActivity : AppCompatActivity() {
         editor.clear()
         editor.commit()
 
-        Toast.makeText(this,"Distance stats have been reset", Toast.LENGTH_SHORT) // Feedback
+        Toast.makeText(this,"Distance stats have been reset", Toast.LENGTH_SHORT).show() // Feedback
     }
 
-    fun resetAllProgress(){
+    private fun resetAllProgress(){
 
         resetDistance()
 
@@ -89,6 +89,6 @@ class SettingsActivity : AppCompatActivity() {
         editor3.clear()
         editor3.commit()
 
-        Toast.makeText(this,"Progress has been reset",Toast.LENGTH_SHORT) // Feedback
+        Toast.makeText(this,"Progress has been reset",Toast.LENGTH_SHORT).show() // Feedback
     }
 }

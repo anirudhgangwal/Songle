@@ -54,7 +54,7 @@ class CorrectActivity : AppCompatActivity() {
     }
 
     // Get video ID from url
-    fun getVideoId(link : String):String{
+    private fun getVideoId(link : String):String{
 
         var id = ""
         for (i in 0..link.length-1){
@@ -67,7 +67,7 @@ class CorrectActivity : AppCompatActivity() {
 
     // on click BACK TO HOME
     fun backToHome(view: View){
-        Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT) // Feedback
+        Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT).show() // Feedback
         val intent = Intent(this,MainActivity::class.java)
         startActivity(intent)
 
@@ -76,7 +76,7 @@ class CorrectActivity : AppCompatActivity() {
     // Take back to home screen
     override fun onBackPressed() {
         super.onBackPressed()
-        Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT) // Feedback
+        Toast.makeText(this,"More puzzles may be available.", Toast.LENGTH_SHORT).show() // Feedback
         val intent = Intent(this,MainActivity::class.java)
         startActivity(intent)
         finish()

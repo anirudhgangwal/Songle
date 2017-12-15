@@ -20,7 +20,7 @@ import java.sql.Timestamp
  *
  * Self contained with all information about itself.
  */
-class Song(val ctx: Context, val number: String, val artist: String, val title: String, val link: String) {
+class Song(private val ctx: Context, val number: String, val artist: String, val title: String, val link: String) {
     val tag = "Song"
 
     // These will be set in init {..} below.
@@ -215,7 +215,7 @@ class Song(val ctx: Context, val number: String, val artist: String, val title: 
 }
 
 // Save maps once downloaded
-class MapDownloadListener(val number: Int,val description:Int) : DownloadCompleteListener{
+class MapDownloadListener(val number: Int, private val description:Int) : DownloadCompleteListener{
     override fun downloadComplete(result: String) {
         MainActivity.songList[number-1].setMap(result,description)
     }

@@ -31,8 +31,8 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
     }
 
 
-    fun parseXml(s: String):ArrayList<Song> {
-        var songs = parse(s)
+    private fun parseXml(s: String):ArrayList<Song> {
+        val songs = parse(s)
 
         return songs
     }
@@ -41,7 +41,7 @@ class SongDownloadListener(private val context: Context) : DownloadCompleteListe
     private val ns: String? = null
 
     @Throws(XmlPullParserException::class, IOException::class)
-    fun parse(input : String): ArrayList<Song> {
+    private fun parse(input : String): ArrayList<Song> {
 
         val stream: InputStream = input.byteInputStream()
 
