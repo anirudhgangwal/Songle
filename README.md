@@ -13,3 +13,5 @@ Following files were submitted for evaluation and feedback along with the source
 2. [Implementation Report](Songle%20-%20Implementation%20report.pdf)
 
 Feedback is currently pending. Will update this section as soon as feedback is available.
+1. [Desing Document Feedback](CSLP-feedback-1.pdf) (including the actual document)
+2. Implementation Report Feedback - pending
